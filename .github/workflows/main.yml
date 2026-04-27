@@ -25,7 +25,7 @@ jobs:
         run: |
           cd ~/haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
-          cd ../../../../../
+          cd ~/
 
       - name: Compile
         run: haxelib run lime build linux
@@ -56,7 +56,7 @@ jobs:
         run: |
           cd C:/haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
-          cd ../../../../../
+          cd C:/
 
       - name: Compile
         run: haxelib run lime build windows
@@ -88,10 +88,10 @@ jobs:
         run: |
           cd ~/haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
-          cd ../../../../../
+          cd ~/
 
       - name: Compile
-        run: arch -x86_64 haxelib run lime build mac"
+        run: arch -x86_64 haxelib run lime build mac
 
       - name: Publish Artifact
         uses: actions/upload-artifact@v6
