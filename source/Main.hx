@@ -4,11 +4,12 @@ import funkin.backend.DebugDisplay;
 import flixel.FlxGame;
 import openfl.Lib;
 import openfl.display.Sprite;
-import openfl.display.StageScaleMode;
 
+/*
 #if linux
 import hxgamemode.GamemodeClient;
 #end
+*/
 
 class Main extends Sprite
 {
@@ -30,9 +31,11 @@ class Main extends Sprite
 
 	public static function main()
 	{
+		/*
 		#if linux
 		GamemodeClient.request_start();
 		#end
+		*/
 
 		Lib.current.addChild(new Main());
 	}
@@ -63,18 +66,8 @@ class Main extends Sprite
 
 		#if !mobile
 		fpsVar = new DebugDisplay(10, 3, 0xFFFFFF);
+		fpsVar.visible = ClientPrefs.showFPS;
 		addChild(fpsVar);
-		Lib.current.stage.align = "tl";
-		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
-		if (fpsVar != null)
-		{
-			fpsVar.visible = ClientPrefs.showFPS;
-		}
-		#end
-
-		#if html5
-		FlxG.autoPause = false;
-		FlxG.mouse.visible = false;
 		#end
 
 		FlxG.signals.gameResized.add(onResize);

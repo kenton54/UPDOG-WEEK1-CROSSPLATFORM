@@ -2049,7 +2049,7 @@ class FunkinLua extends FunkinScript
 
 		Lua_helper.add_callback(lua, "changePresence",
 			function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float) {
-				#if desktop
+				#if DISCORD_ALLOWED
 				DiscordClient.changePresence(details, state, smallImageKey, hasStartTimestamp, endTimestamp);
 				#end
 			});
@@ -2375,58 +2375,6 @@ class FunkinLua extends FunkinScript
 		#end
 	}
 
-	public static function setVarInArray(instance:Dynamic, variable:String, value:Dynamic):Any
-	{
-		var shit:Array<String> = variable.split('[');
-		if (shit.length > 1)
-		{
-			var blah:Dynamic = Reflect.getProperty(instance, shit[0]);
-			for (i in 1...shit.length)
-			{
-				var leNum:Dynamic = shit[i].substr(0, shit[i].length - 1);
-				if (i >= shit.length - 1) // Last array
-					blah[leNum] = value;
-				else // Anything else
-					blah = blah[leNum];
-			}
-			return blah;
-		}
-		/*if(Std.isOfType(instance, Map))
-				instance.set(variable,value);
-			else */
-		switch (Type.typeof(instance))
-		{
-			case ValueType.TClass(haxe.ds.StringMap) | ValueType.TClass(haxe.ds.ObjectMap) | ValueType.TClass(haxe.ds.IntMap) | ValueType.TClass(haxe.ds.EnumValueMap):
-				instance.set(variable, value);
-			default:
-				Reflect.setProperty(instance, variable, value);
-		};
-
-		return true;
-	}
-
-	public static function getVarInArray(instance:Dynamic, variable:String):Any
-	{
-		var shit:Array<String> = variable.split('[');
-		if (shit.length > 1)
-		{
-			var blah:Dynamic = Reflect.getProperty(instance, shit[0]);
-			for (i in 1...shit.length)
-			{
-				var leNum:Dynamic = shit[i].substr(0, shit[i].length - 1);
-				blah = blah[leNum];
-			}
-			return blah;
-		}
-		switch (Type.typeof(instance))
-		{
-			case ValueType.TClass(haxe.ds.StringMap) | ValueType.TClass(haxe.ds.ObjectMap) | ValueType.TClass(haxe.ds.IntMap) | ValueType.TClass(haxe.ds.EnumValueMap):
-				return instance.get(variable);
-			default:
-				return Reflect.getProperty(instance, variable);
-		};
-	}
-
 	inline static function getTextObject(name:String):FlxText
 	{
 		return PlayState.instance.modchartTexts.exists(name) ? PlayState.instance.modchartTexts.get(name) : Reflect.getProperty(PlayState.instance, name);
@@ -2560,123 +2508,6 @@ class FunkinLua extends FunkinScript
 		}
 	}
 
-	// Better optimized than using some getProperty shit or idk
-	public static function getFlxEaseByString(?ease:String = '')
-	{
-		switch (ease.toLowerCase().trim())
-		{
-			case 'backin':
-				return FlxEase.backIn;
-			case 'backinout':
-				return FlxEase.backInOut;
-			case 'backout':
-				return FlxEase.backOut;
-			case 'bouncein':
-				return FlxEase.bounceIn;
-			case 'bounceinout':
-				return FlxEase.bounceInOut;
-			case 'bounceout':
-				return FlxEase.bounceOut;
-			case 'circin':
-				return FlxEase.circIn;
-			case 'circinout':
-				return FlxEase.circInOut;
-			case 'circout':
-				return FlxEase.circOut;
-			case 'cubein':
-				return FlxEase.cubeIn;
-			case 'cubeinout':
-				return FlxEase.cubeInOut;
-			case 'cubeout':
-				return FlxEase.cubeOut;
-			case 'elasticin':
-				return FlxEase.elasticIn;
-			case 'elasticinout':
-				return FlxEase.elasticInOut;
-			case 'elasticout':
-				return FlxEase.elasticOut;
-			case 'expoin':
-				return FlxEase.expoIn;
-			case 'expoinout':
-				return FlxEase.expoInOut;
-			case 'expoout':
-				return FlxEase.expoOut;
-			case 'quadin':
-				return FlxEase.quadIn;
-			case 'quadinout':
-				return FlxEase.quadInOut;
-			case 'quadout':
-				return FlxEase.quadOut;
-			case 'quartin':
-				return FlxEase.quartIn;
-			case 'quartinout':
-				return FlxEase.quartInOut;
-			case 'quartout':
-				return FlxEase.quartOut;
-			case 'quintin':
-				return FlxEase.quintIn;
-			case 'quintinout':
-				return FlxEase.quintInOut;
-			case 'quintout':
-				return FlxEase.quintOut;
-			case 'sinein':
-				return FlxEase.sineIn;
-			case 'sineinout':
-				return FlxEase.sineInOut;
-			case 'sineout':
-				return FlxEase.sineOut;
-			case 'smoothstepin':
-				return FlxEase.smoothStepIn;
-			case 'smoothstepinout':
-				return FlxEase.smoothStepInOut;
-			case 'smoothstepout':
-				return FlxEase.smoothStepInOut;
-			case 'smootherstepin':
-				return FlxEase.smootherStepIn;
-			case 'smootherstepinout':
-				return FlxEase.smootherStepInOut;
-			case 'smootherstepout':
-				return FlxEase.smootherStepOut;
-		}
-		return FlxEase.linear;
-	}
-
-	public static function blendModeFromString(blend:String):BlendMode
-	{
-		switch (blend.toLowerCase().trim())
-		{
-			case 'add':
-				return ADD;
-			case 'alpha':
-				return ALPHA;
-			case 'darken':
-				return DARKEN;
-			case 'difference':
-				return DIFFERENCE;
-			case 'erase':
-				return ERASE;
-			case 'hardlight':
-				return HARDLIGHT;
-			case 'invert':
-				return INVERT;
-			case 'layer':
-				return LAYER;
-			case 'lighten':
-				return LIGHTEN;
-			case 'multiply':
-				return MULTIPLY;
-			case 'overlay':
-				return OVERLAY;
-			case 'screen':
-				return SCREEN;
-			case 'shader':
-				return SHADER;
-			case 'subtract':
-				return SUBTRACT;
-		}
-		return NORMAL;
-	}
-
 	function cameraFromString(cam:String):FlxCamera
 	{
 		switch (cam.toLowerCase())
@@ -2802,27 +2633,6 @@ class FunkinLua extends FunkinScript
 		return Function_Continue;
 	}
 
-	public static function getPropertyLoopThingWhatever(killMe:Array<String>, ?checkForTextsToo:Bool = true, ?getProperty:Bool = true):Dynamic
-	{
-		var coverMeInPiss:Dynamic = getObjectDirectly(killMe[0], checkForTextsToo);
-		var end = killMe.length;
-		if (getProperty) end = killMe.length - 1;
-
-		for (i in 1...end)
-		{
-			coverMeInPiss = getVarInArray(coverMeInPiss, killMe[i]);
-		}
-		return coverMeInPiss;
-	}
-
-	public static function getObjectDirectly(objectName:String, ?checkForTextsToo:Bool = true):Dynamic
-	{
-		var coverMeInPiss:Dynamic = PlayState.instance.getLuaObject(objectName, checkForTextsToo);
-		if (coverMeInPiss == null) coverMeInPiss = getVarInArray(getInstance(), objectName);
-
-		return coverMeInPiss;
-	}
-
 	#if LUA_ALLOWED
 	function resultIsAllowed(leLua:State, leResult:Null<Int>)
 	{ // Makes it ignore warnings
@@ -2911,33 +2721,6 @@ class FunkinLua extends FunkinScript
 	package.loaded.process = nil;
 
 	"; // Fuck this, I can't figure out linc_lua, so I'mma set everything in Lua itself - Super
-}
-
-class ModchartSprite extends FlxSprite
-{
-	public var wasAdded:Bool = false;
-
-	// public var isInFront:Bool = false;
-
-	public function new(?x:Float = 0, ?y:Float = 0)
-	{
-		super(x, y);
-		antialiasing = ClientPrefs.globalAntialiasing;
-	}
-}
-
-class ModchartText extends FlxText
-{
-	public var wasAdded:Bool = false;
-
-	public function new(x:Float, y:Float, text:String, width:Float)
-	{
-		super(x, y, width, text, 16);
-		setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		cameras = [PlayState.instance.camHUD];
-		scrollFactor.set();
-		borderSize = 2;
-	}
 }
 
 class DebugLuaText extends FlxText

@@ -32,9 +32,6 @@
 	<!--Mobile-specific-->
 	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false"/>
 
-	<!--Switch-specific-->
-	<window if="switch" orientation="landscape" fullscreen="true" width="0" height="0" resizable="true" />
-
 	<!-- _____________________________ Path Settings ____________________________ -->
 
 	<!-- Use project assets folder instead of the build one if on a debug build. -->
@@ -98,7 +95,6 @@
 	
 	<haxeflag name="--macro" value="include('funkin')" />
 	<haxeflag name="--macro" value="include('flixel.addons.effects')" />
-	<haxeflag name="-dce no" />
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
 
@@ -107,7 +103,6 @@
 	<haxedef name="HXCPP_CHECK_POINTER" if="CRASH_HANDLER" />
 	<haxedef name="HXCPP_STACK_LINE" if="CRASH_HANDLER" />
 	<haxedef name="HXCPP_STACK_TRACE" if="CRASH_HANDLER" />
-
 
 	<!-- <define name="DISABLE_TRACES" if="desktop release"/> -->
 
@@ -157,7 +152,7 @@
 	<!-- _________________________________ Custom _______________________________ -->
 
 	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
-	
+
 	<icon path="projFiles/icon/icon16.png" size='16'/>
 	<icon path="projFiles/icon/icon32.png" size='32'/>
 	<icon path="projFiles/icon/icon64.png" size='64'/>

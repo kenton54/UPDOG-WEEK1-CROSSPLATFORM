@@ -1,17 +1,22 @@
 package funkin.states;
 
+#if VIDEOS_ALLOWED
 import funkin.objects.video.FunkinVideoSprite;
+#end
 
 class ImpostorCredits extends MusicBeatState
 {
 	var infry:FlxSprite;
-	
+
+	#if VIDEOS_ALLOWED
 	var video = new FunkinVideoSprite();
+	#end
 	
 	override function create()
 	{
 		super.create();
-		
+
+		#if VIDEOS_ALLOWED
 		add(video);
 		video.load(Paths.video('VS_IMPOSTOR_WEEK_2'));
 		video.onReady.add(() -> {
@@ -19,9 +24,9 @@ class ImpostorCredits extends MusicBeatState
 			video.updateHitbox();
 		});
 		// video.playVideo();
-		
+
 		video.onFinish.addOnce(exit);
-		
+
 		infry = new FlxSprite().loadFromSheet('menu/credits/hi', 'hi', 24);
 		infry.animation.curAnim.looped = false;
 		infry.animation.pause();
@@ -31,23 +36,27 @@ class ImpostorCredits extends MusicBeatState
 		infry.animation.onFinish.add((anim) -> {
 			FlxTween.tween(infry, {y: FlxG.height}, 1);
 		});
-		
+
 		var ct = new FlxSprite(42.15, 668.3).loadGraphic(Paths.image('menu/common/controls_cutscene'));
 		add(ct);
-		
+
 		FlxTimer.wait(1, () -> {
 			video.playVideo();
 		});
+		#else
+		exit();
+		#end
 	}
-	
+
 	var skipped = false;
-	
+
 	var holdTime = 0.0;
-	
+
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		
+
+		#if VIDEOS_ALLOWED
 		// if (FlxG.keys.pressed.ENTER) holdTime += elapsed;
 		// else holdTime = 0;
 		
@@ -65,6 +74,7 @@ class ImpostorCredits extends MusicBeatState
 		{
 			exit();
 		}
+		#end
 	}
 	
 	function exit()

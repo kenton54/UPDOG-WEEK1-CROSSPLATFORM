@@ -41,7 +41,9 @@ class Init extends FlxState
 
 		funkin.data.Highscore.load();
 
+		#if VIDEOS_ALLOWED
 		funkin.objects.video.FunkinVideoSprite.init();
+		#end
 
 		FlxG.scaleMode = new funkin.backend.FunkinRatioScaleMode();
 

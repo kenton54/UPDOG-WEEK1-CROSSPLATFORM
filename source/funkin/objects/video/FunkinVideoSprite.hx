@@ -1,5 +1,6 @@
 package funkin.objects.video;
 
+#if VIDEOS_ALLOWED
 import flixel.util.FlxSignal;
 
 #if html5
@@ -184,3 +185,4 @@ class FunkinVideoSprite extends VideoHandler
 		super.destroy();
 	}
 }
+#end

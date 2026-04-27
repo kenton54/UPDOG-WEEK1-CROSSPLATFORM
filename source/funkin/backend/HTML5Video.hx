@@ -1,6 +1,6 @@
 package funkin.backend;
 
-#if html5
+#if (html5 && VIDEOS_ALLOWED)
 import flixel.math.FlxRect;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxSignal;

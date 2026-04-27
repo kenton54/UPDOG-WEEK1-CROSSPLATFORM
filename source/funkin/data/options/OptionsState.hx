@@ -65,7 +65,7 @@ class OptionsState extends MusicBeatState
 	}
 	override function create()
 	{
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options", null);
 		#end
 

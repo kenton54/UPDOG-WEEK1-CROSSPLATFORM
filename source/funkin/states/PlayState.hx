@@ -28,7 +28,11 @@ import funkin.objects.Note.EventNote;
 import funkin.data.scripts.FunkinScript.ScriptType;
 import funkin.huds.BaseHUD;
 import funkin.data.scripts.*;
+
+#if LUA_ALLOWED
 import funkin.data.scripts.FunkinLua;
+#end
+
 import funkin.data.Section.SwagSection;
 import funkin.data.Song.SwagSong;
 import funkin.data.StageData;
@@ -38,7 +42,6 @@ import funkin.data.*;
 import funkin.states.*;
 import funkin.states.substates.*;
 import funkin.states.editors.*;
-import funkin.data.scripts.FunkinLua.ModchartSprite;
 import funkin.modchart.*;
 import funkin.backend.SyncedFlxSoundGroup;
 import funkin.utils.DifficultyUtil;
@@ -312,7 +315,9 @@ class PlayState extends MusicBeatState
 	// Script shit
 	public static var instance:PlayState;
 	
+	#if LUA_ALLOWED
 	public var luaArray:Array<FunkinLua> = [];
+	#end
 	public var funkyScripts:Array<FunkinScript> = [];
 	public var hscriptArray:Array<FunkinIris> = [];
 	
@@ -331,7 +336,9 @@ class PlayState extends MusicBeatState
 	public var script_COVERLOOPOffsets:Vector<FlxPoint>;
 	public var script_COVERENDOffsets:Vector<FlxPoint>;
 	
+	#if LUA_ALLOWED
 	var luaDebugGroup:FlxTypedGroup<DebugLuaText>;
+	#end
 	
 	public var introSoundsSuffix:String = '';
 	
@@ -422,8 +429,8 @@ class PlayState extends MusicBeatState
 	
 	// null checking
 	function callHUDFunc(f:BaseHUD->Void) if (playHUD != null) f(playHUD);
-	
-	#if (debug && !RELEASE_BUILD)
+
+	#if debug
 	inline function addFlxWatches()
 	{
 		FlxG.watch.addFunction('curStep', () -> curStep);
@@ -445,7 +452,7 @@ class PlayState extends MusicBeatState
 		// for lua
 		instance = this;
 		
-		#if (debug && !RELEASE_BUILD)
+		#if debug
 		addFlxWatches();
 		#end
 		
@@ -1532,7 +1539,7 @@ class PlayState extends MusicBeatState
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
 		
-		#if desktop
+		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence (with Time Left)
 		DiscordClient.changePresence(detailsText, getPresence(), null, true, songLength);
 		#end
@@ -2181,6 +2188,7 @@ class PlayState extends MusicBeatState
 			FlxTimer.globalManager.forEach((i:FlxTimer) -> if (!i.finished) i.active = false);
 			FlxTween.globalManager.forEach((i:FlxTween) -> if (!i.finished) i.active = false);
 
+			#if VIDEOS_ALLOWED
 			@:privateAccess
 			{
 				for (i in funkin.objects.video.FunkinVideoSprite._videos)
@@ -2192,7 +2200,8 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-			
+			#end
+
 			for (i in playFields.members)
 			{
 				if (i.inControl && i.playerControls)
@@ -2224,7 +2233,8 @@ class PlayState extends MusicBeatState
 			onResumeSignal.dispatch();
 			FlxTimer.globalManager.forEach((i:FlxTimer) -> if (!i.finished) i.active = true);
 			FlxTween.globalManager.forEach((i:FlxTween) -> if (!i.finished) i.active = true);
-			
+
+			#if VIDEOS_ALLOWED
 			@:privateAccess
 			{
 				for (i in funkin.objects.video.FunkinVideoSprite._videos)
@@ -2236,11 +2246,12 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-			
+			#end
+
 			paused = false;
 			callOnScripts('onResume', []);
 			
-			#if desktop
+			#if DISCORD_ALLOWED
 			if (startTimer != null && startTimer.finished)
 			{
 				DiscordClient.changePresence(detailsText, getPresence(), null, true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
@@ -2257,7 +2268,7 @@ class PlayState extends MusicBeatState
 	
 	override public function onFocus():Void
 	{
-		#if desktop
+		#if DISCORD_ALLOWED
 		if (health > 0 && !paused)
 		{
 			if (Conductor.songPosition > 0.0)
@@ -2276,7 +2287,7 @@ class PlayState extends MusicBeatState
 	
 	override public function onFocusLost():Void
 	{
-		#if desktop
+		#if DISCORD_ALLOWED
 		if (health > 0 && !paused)
 		{
 			DiscordClient.changePresence(detailsPausedText, getPresence());
@@ -2799,7 +2810,7 @@ class PlayState extends MusicBeatState
 					- boyfriend.positionArray[1], camFollowPos.x,
 					camFollowPos.y));
 					
-				#if desktop
+				#if DISCORD_ALLOWED
 				// Game Over doesn't get his own variable because it's only used here
 				DiscordClient.changePresence("Game Over - " + detailsText, getPresence());
 				#end
@@ -3266,7 +3277,7 @@ class PlayState extends MusicBeatState
 				var killMe:Array<String> = value1.split('.');
 				if (killMe.length > 1)
 				{
-					Reflect.setProperty(FunkinLua.getPropertyLoopThingWhatever(killMe, true, true), killMe[killMe.length - 1], value2);
+					Reflect.setProperty(Globals.getPropertyLoopThingWhatever(killMe, true, true), killMe[killMe.length - 1], value2);
 				}
 				else
 				{
@@ -4590,7 +4601,9 @@ class PlayState extends MusicBeatState
 		
 		hscriptArray = [];
 		funkyScripts = [];
+		#if LUA_ALLOWED
 		luaArray = [];
+		#end
 		notetypeScripts.clear();
 		eventScripts.clear();
 		
@@ -4614,6 +4627,7 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.fadeTween = null;
 	}
 	
+	#if LUA_ALLOWED
 	public function removeLua(lua:FunkinLua)
 	{
 		if (luaArray != null && !preventLuaRemove)
@@ -4621,6 +4635,7 @@ class PlayState extends MusicBeatState
 			luaArray.remove(lua);
 		}
 	}
+	#end
 	
 	var lastStepHit:Int = -1;
 	
@@ -4747,7 +4762,9 @@ class PlayState extends MusicBeatState
 		callHUDFunc(p -> p.sectionHit());
 	}
 	
+	#if LUA_ALLOWED
 	public var closeLuas:Array<FunkinLua> = [];
+	#end
 	
 	public function callOnScripts(event:String, args:Array<Dynamic>, ignoreStops:Bool = false, ?exclusions:Array<String>, ?scriptArray:Array<Dynamic>, ?ignoreSpecialShit:Bool = true)
 	{
@@ -4944,9 +4961,11 @@ class PlayState extends MusicBeatState
 		super.startOutro(onOutroComplete);
 	}
 	
+	#if DISCORD_ALLOWED
 	function getPresence()
 	{
 		// Get the discord presence
 		return ClientPrefs.disc_rpc ? SONG.song : FlxG.random.getObject(DiscordClient.discordPresences);
 	}
+	#end
 }

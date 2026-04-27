@@ -489,7 +489,11 @@ class FunkinIris extends FunkinScript
 		set("CoolUtil", CoolUtil);
 		set("StageData", StageData);
 		set("PlayState", PlayState);
+
+		#if LUA_ALLOWED
 		set("FunkinLua", FunkinLua);
+		#end
+
 		set("FunkinIris", FunkinIris);
 
 		set('WindowUtil', funkin.utils.WindowUtil); // temp till i fix some shit
@@ -503,12 +507,13 @@ class FunkinIris extends FunkinScript
 		set("CoolUtil", CoolUtil);
 		set("StageData", StageData);
 		set("PlayState", PlayState);
-		set("FunkinLua", FunkinLua);
 
 		// objects
 		set("Note", Note);
 		set("Bar", funkin.objects.Bar);
+		#if VIDEOS_ALLOWED
 		set("FunkinVideoSprite", funkin.objects.video.FunkinVideoSprite);
+		#end
 		set("BackgroundDancer", funkin.objects.stageobjects.BackgroundDancer);
 		set("BackgroundGirls", funkin.objects.stageobjects.BackgroundGirls);
 		set("TankmenBG", funkin.objects.stageobjects.TankmenBG);

@@ -38,7 +38,7 @@ class MenuCharacterEditorState extends MusicBeatState
 				confirm_anim: 'M Dad Idle',
 				flipX: false
 			};
-		#if desktop
+		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
 		#end
@@ -242,7 +242,7 @@ class MenuCharacterEditorState extends MusicBeatState
 		confirmInputText.visible = (curTypeSelected == 1);
 		updateOffset();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
 		#end
