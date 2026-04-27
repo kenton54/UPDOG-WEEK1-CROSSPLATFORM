@@ -44,8 +44,8 @@ class FunkinSoundTray extends FlxSoundTray
 		backingBar.scaleX = graphicScale;
 		backingBar.scaleY = graphicScale;
 		backingBar.smoothing = ClientPrefs.globalAntialiasing;
-		addChild(backingBar);
 		backingBar.alpha = 0.4;
+		addChild(backingBar);
 
 		// clear the bars array entirely, it was initialized
 		// in the super class
@@ -53,9 +53,9 @@ class FunkinSoundTray extends FlxSoundTray
 
 		// 1...11 due to how block named the assets,
 		// we are trying to get assets bar_1-10
-		for (i in 1...11)
+		for (i in 0...10)
 		{
-			var bar:Bitmap = new Bitmap(Assets.getBitmapData('assets/shared/images/soundtray/bars_$i.png'));
+			var bar:Bitmap = new Bitmap(Assets.getBitmapData('assets/shared/images/soundtray/bars_${(i + 1)}.png'));
 			bar.x = 9;
 			bar.y = 5;
 			bar.scaleX = graphicScale;

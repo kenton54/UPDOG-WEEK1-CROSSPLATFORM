@@ -1,6 +1,6 @@
 package funkin.data.scripts;
 
-import openfl.Assets;
+import openfl.utils.Assets;
 import funkin.data.scripts.FunkinScript;
 import funkin.utils.MacroUtil;
 import crowplexus.iris.IrisConfig;
@@ -217,7 +217,7 @@ class FunkinIris extends FunkinScript
 {
 	public static final exts:Array<String> = ['hx', 'hxs', 'hscript'];
 
-	public static function getPath(path:String, ?global:Bool = true)
+	public static function getPath(path:String, ?global:Bool = true):String
 	{
 		for (extension in exts)
 		{
@@ -228,9 +228,8 @@ class FunkinIris extends FunkinScript
 
 			for (i in [Paths.modFolders(file, global), Paths.getSharedPath(file)])
 			{
-				if (!FileSystem.exists(i))
-					continue;
-				return i;
+				if (Assets.exists(i))
+					return i;
 			}
 
 			var tempPath = Paths.getPath(file);
@@ -242,17 +241,17 @@ class FunkinIris extends FunkinScript
 		return path;
 	}
 
-	public static function fromString(script:String, ?name:String = "Script", ?additionalVars:Map<String, Any>)
+	public static function fromString(script:String, ?name:String = "Script", ?additionalVars:Map<String, Any>):FunkinIris
 	{
 		return new FunkinIris(script, name, additionalVars);
 	}
 
-	public static function fromFile(file:String, ?name:String, ?additionalVars:Map<String, Any>)
+	public static function fromFile(file:String, ?name:String, ?additionalVars:Map<String, Any>):FunkinIris
 	{
 		if (name == null)
 			name = file;
 
-		return new FunkinIris(File.getContent(file), name, additionalVars);
+		return fromString(#if MODS_ALLOWED File.getContent(file) #else Assets.getText(file) #end, name, additionalVars);
 	}
 
 	public static function InitLogger()
@@ -517,7 +516,7 @@ class FunkinIris extends FunkinScript
 		set("HealthIcon", HealthIcon);
 		set("Character", Character);
 		set("NoteSplash", NoteSplash);
-		set("BGSprite", BGSprite);
+		set("BGSprite", funkin.objects.BGSprite);
 		set('SpriteFromSheet', SpriteFromSheet);
 		set("StrumNote", StrumNote);
 		set("Alphabet", Alphabet);

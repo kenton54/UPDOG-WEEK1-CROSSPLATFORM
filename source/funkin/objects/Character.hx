@@ -15,14 +15,13 @@ import flixel.tweens.FlxEase;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
 import funkin.data.Section.SwagSection;
+import openfl.utils.AssetType;
+import openfl.utils.Assets;
+
 #if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
 #end
-import openfl.utils.AssetType;
-import openfl.utils.Assets;
-import haxe.Json;
-import haxe.format.JsonParser;
 
 using StringTools;
 
@@ -110,58 +109,16 @@ class Character extends FlxSprite
 
 	public static function getCharacterFile(character:String):CharacterFile
 	{
-		var characterPath:String = 'characters/' + character + '.json';
+		final characterPath:String = 'characters/$character.json';
 
-		//bad but whatever idont got time to rewrite dis
 		var path:String = Paths.modFolders(characterPath);
-		if (!FileSystem.exists(path))
-		{
+		if (!Assets.exists(path))
 			path = Paths.getPath(characterPath);
-		}
 
+		if (!Assets.exists(path))
+			path = Paths.getSharedPath('characters/$DEFAULT_CHARACTER.json'); // If a character couldn't be found, change him to BF just to prevent a crash
 
-		var exists = Assets.exists(path);
-		if (!exists)
-		{
-			exists = FileSystem.exists(path);
-		}
-
-		if (!exists)
-		{
-			path = Paths.getSharedPath('characters/' + DEFAULT_CHARACTER +
-				'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
-		}
-
-
-		var json = Assets.exists(path) ? Assets.getText(path) : File.getContent(path);
-
-		return cast Json.parse(json);
-
-
-		// #if MODS_ALLOWED
-		// var path:String = Paths.modFolders(characterPath);
-		// if (!FileSystem.exists(path))
-		// {
-		// 	path = Paths.getSharedPath(characterPath);
-		// }
-
-		// if (!FileSystem.exists(path))
-		// #else
-		// var path:String = Paths.getSharedPath(characterPath);
-		// if (!Assets.exists(path))
-		// #end
-		// {
-		// 	path = Paths.getSharedPath('characters/' + DEFAULT_CHARACTER +
-		// 		'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
-		// }
-
-		// #if MODS_ALLOWED
-		// var rawJson = File.getContent(path);
-		// #else
-		// var rawJson = Assets.getText(path);
-		// #end
-
-		// return cast Json.parse(rawJson);
+		return haxe.Json.parse(Assets.getText(path));
 	}
 
 	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
@@ -181,46 +138,43 @@ class Character extends FlxSprite
 			ghost.alpha = 0.6;
 			doubleGhosts.push(ghost);
 		}
+
 		var library:String = null;
 		switch (curCharacter)
 		{
 			// case 'your character name in case you want to hardcode them instead':
 
 			default:
-				var json:CharacterFile = getCharacterFile(curCharacter);
+				final json:CharacterFile = getCharacterFile(curCharacter);
 				var spriteType = "sparrow";
 				// sparrow
 				// packer
 				// texture
 				#if MODS_ALLOWED
 				var modTxtToFind:String = Paths.modsTxt(json.image);
-				var txtToFind:String = Paths.getPath('images/' + json.image + '.txt', TEXT);
+				var txtToFind:String = Paths.getPath('images/${json.image}.txt', TEXT);
 
 				// var modTextureToFind:String = Paths.modFolders("images/"+json.image);
 				// var textureToFind:String = Paths.getPath('images/' + json.image, new AssetType();
 
 				if (FileSystem.exists(modTxtToFind) || FileSystem.exists(txtToFind) || Assets.exists(txtToFind))
 				#else
-				if (Assets.exists(Paths.getPath('images/' + json.image + '.txt', TEXT)))
+				if (Assets.exists(Paths.getPath('images/${json.image}.txt', TEXT)))
 				#end
-				{
 					spriteType = "packer";
-				}
 
 				#if MODS_ALLOWED
-				var modAnimToFind:String = Paths.modFolders('images/' + json.image + '/Animation.json');
-				var animToFind:String = Paths.getPath('images/' + json.image + '/Animation.json', TEXT);
+				var modAnimToFind:String = Paths.modFolders('images/${json.image}/Animation.json');
+				var animToFind:String = Paths.getPath('images/${json.image}/Animation.json', TEXT);
 
 				// var modTextureToFind:String = Paths.modFolders("images/"+json.image);
 				// var textureToFind:String = Paths.getPath('images/' + json.image, new AssetType();
 
 				if (FileSystem.exists(modAnimToFind) || FileSystem.exists(animToFind) || Assets.exists(animToFind))
 				#else
-				if (Assets.exists(Paths.getPath('images/' + json.image + '/Animation.json', TEXT)))
+				if (Assets.exists(Paths.getPath('images/${json.image}/Animation.json', TEXT)))
 				#end
-				{
 					spriteType = "texture";
-				}
 
 				switch (spriteType)
 				{
@@ -233,12 +187,13 @@ class Character extends FlxSprite
 					// case "texture":
 					// 	frames = AtlasFrameMaker.construct(json.image);
 				}
+
 				imageFile = json.image;
 
 				if (json.scale != 1)
 				{
 					jsonScale = json.scale;
-					setGraphicSize(Std.int(width * jsonScale));
+					scale.set(jsonScale, jsonScale);
 					updateHitbox();
 				}
 
@@ -247,7 +202,8 @@ class Character extends FlxSprite
 
 				healthIcon = json.healthicon;
 				singDuration = json.sing_duration;
-				flipX = !!json.flip_x;
+				flipX = json.flip_x;
+
 				if (json.no_antialiasing)
 				{
 					antialiasing = false;
@@ -286,19 +242,15 @@ class Character extends FlxSprite
 									camOffset = [0, 0];
 							}
 						}
+
 						if (animIndices != null && animIndices.length > 0)
-						{
 							animation.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
-						}
 						else
-						{
 							animation.addByPrefix(animAnim, animName, animFps, animLoop);
-						}
 
 						if (anim.offsets != null && anim.offsets.length > 1)
-						{
 							addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
-						}
+
 						camOffsets[anim.anim] = [camOffset[0], camOffset[1]];
 					}
 				}
@@ -308,10 +260,12 @@ class Character extends FlxSprite
 				}
 				// trace('Loaded file to character ' + curCharacter);
 		}
+
 		originalFlipX = flipX;
 
 		if (animOffsets.exists('singLEFTmiss') || animOffsets.exists('singDOWNmiss') || animOffsets.exists('singUPmiss') || animOffsets.exists('singRIGHTmiss'))
 			hasMissAnimations = true;
+
 		recalculateDanceIdle();
 		dance();
 
@@ -323,7 +277,7 @@ class Character extends FlxSprite
 		final baseScriptFile:String = 'characters/' + character;
 
 		var scriptFile = FunkinIris.getPath(baseScriptFile);
-		if (FileSystem.exists(scriptFile))
+		if (Assets.exists(scriptFile))
 		{
 			var script = FunkinIris.fromFile(scriptFile);
 			curCharacterScript = script;

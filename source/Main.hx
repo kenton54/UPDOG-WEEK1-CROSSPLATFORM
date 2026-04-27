@@ -1,12 +1,14 @@
 package;
 
 import funkin.backend.DebugDisplay;
-import flixel.FlxG;
 import flixel.FlxGame;
-import flixel.FlxState;
 import openfl.Lib;
 import openfl.display.Sprite;
 import openfl.display.StageScaleMode;
+
+#if linux
+import hxgamemode.GamemodeClient;
+#end
 
 class Main extends Sprite
 {
@@ -31,8 +33,12 @@ class Main extends Sprite
 		funkin.utils.MacroUtil.haxeVersionEnforcement();
 	}
 
-	public static function main():Void
+	public static function main()
 	{
+		#if linux
+		GamemodeClient.request_start();
+		#end
+
 		Lib.current.addChild(new Main());
 	}
 

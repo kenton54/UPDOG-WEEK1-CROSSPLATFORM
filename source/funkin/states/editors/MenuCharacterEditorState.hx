@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+#if EDITORS_ALLOWED
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
@@ -471,3 +472,4 @@ class MenuCharacterEditorState extends MusicBeatState
 		FlxG.log.error("Problem saving file");
 	}
 }
+#end

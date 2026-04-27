@@ -284,7 +284,7 @@ class NoteSkinHelper
 
 		try
 		{
-			rawJson = File.getContent(path).trim();
+			rawJson = #if MODS_ALLOWED sys.io.File.getContent(path) #else openfl.utils.Assets.getText(path) #end .trim();
 			data = parseJSON(rawJson);
 		}
 		catch (e:Dynamic)

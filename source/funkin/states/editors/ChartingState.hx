@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+#if EDITORS_ALLOWED
 import funkin.utils.DifficultyUtil;
 import haxe.ds.IntMap;
 import openfl.geom.Rectangle;
@@ -716,16 +717,15 @@ class ChartingState extends MusicBeatState
 		stepperSpeed.value = _song.speed;
 		stepperSpeed.name = 'song_speed';
 		blockPressWhileTypingOnStepper.push(stepperSpeed);
+
+		var directories:Array<String> = [Paths.getSharedPath('characters/')];
+
 		#if MODS_ALLOWED
-		var directories:Array<String> = [
-			Paths.mods('characters/'),
-			Paths.mods(Paths.currentModDirectory + '/characters/'),
-			Paths.getSharedPath('characters/')
-		];
+		directories.push(Paths.mods('characters/'));
+		directories.push(Paths.mods(Paths.currentModDirectory + '/characters/'));
+
 		for (mod in Paths.getGlobalMods())
 			directories.push(Paths.mods(mod + '/characters/'));
-		#else
-		var directories:Array<String> = [Paths.getSharedPath('characters/')];
 		#end
 
 		var tempMap:Map<String, Bool> = new Map<String, Bool>();
@@ -735,13 +735,12 @@ class ChartingState extends MusicBeatState
 			tempMap.set(characters[i], true);
 		}
 
-		#if MODS_ALLOWED
-		for (i in 0...directories.length)
+		for (directory in directories)
 		{
-			var directory:String = directories[i];
+			#if MODS_ALLOWED
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in Paths.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -755,8 +754,22 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
+			#else
+			for (file in Paths.readDirectory(directory))
+			{
+				var path = haxe.io.Path.join([directory, file]);
+				if (file.endsWith('.json'))
+				{
+					var charToCheck:String = file.substr(0, file.length - 5);
+					if (!hiddenChars.contains(charToCheck) && !charToCheck.endsWith('-dead') && !tempMap.exists(charToCheck))
+					{
+						tempMap.set(charToCheck, true);
+						characters.push(charToCheck);
+					}
+				}
+			}
+			#end
 		}
-		#end
 
 		var player1DropDown = new FlxUIDropDownMenuEx(10, stepperSpeed.y + 45, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true),
 			function(character:String) {
@@ -782,19 +795,18 @@ class ChartingState extends MusicBeatState
 		player2DropDown.selectedLabel = _song.player2;
 		blockPressWhileScrolling.push(player2DropDown);
 
+		var directories:Array<String> = [Paths.getSharedPath('stages/')];
+
 		#if MODS_ALLOWED
-		var directories:Array<String> = [
-			Paths.mods('stages/'),
-			Paths.mods(Paths.currentModDirectory + '/stages/'),
-			Paths.getSharedPath('stages/')
-		];
+		directories.push(Paths.mods('stages/'));
+		directories.push(Paths.mods(Paths.currentModDirectory + '/stages/'));
+
 		for (mod in Paths.getGlobalMods())
 			directories.push(Paths.mods(mod + '/stages/'));
-		#else
-		var directories:Array<String> = [Paths.getSharedPath('stages/')];
 		#end
 
 		tempMap.clear();
+
 		var stageFile:Array<String> = CoolUtil.coolTextFile(Paths.txt('stageList'));
 		var stages:Array<String> = [];
 		for (i in 0...stageFile.length)
@@ -806,13 +818,13 @@ class ChartingState extends MusicBeatState
 			}
 			tempMap.set(stageToCheck, true);
 		}
-		#if MODS_ALLOWED
-		for (i in 0...directories.length)
+
+		for (directory in directories)
 		{
-			var directory:String = directories[i];
+			#if MODS_ALLOWED
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in Paths.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -826,8 +838,22 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
+			#else
+			for (file in Paths.readDirectory(directory))
+			{
+				var path = haxe.io.Path.join([directory, file]);
+				if (file.endsWith('.json'))
+				{
+					var stageToCheck:String = file.substr(0, file.length - 5);
+					if (!hiddenStages.contains(stageToCheck) && !tempMap.exists(stageToCheck))
+					{
+						tempMap.set(stageToCheck, true);
+						stages.push(stageToCheck);
+					}
+				}
+			}
+			#end
 		}
-		#end
 
 		if (stages.length < 1) stages.push('stage');
 
@@ -1395,6 +1421,7 @@ class ChartingState extends MusicBeatState
 		#if MODS_ALLOWED
 		directories.push(Paths.mods('custom_notetypes/'));
 		directories.push(Paths.mods(Paths.currentModDirectory + '/custom_notetypes/'));
+
 		for (mod in Paths.getGlobalMods())
 			directories.push(Paths.mods(mod + '/custom_notetypes/'));
 		#end
@@ -1407,19 +1434,20 @@ class ChartingState extends MusicBeatState
 			".hx",
 			".hxs"
 		];
-		for (i in 0...directories.length)
+
+		for (directory in directories)
 		{
-			var directory:String = directories[i];
+			#if MODS_ALLOWED
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in Paths.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path))
 					{
 						for (ext in exts)
 						{
-							if (file.endsWith(ext))
+							if (!FileSystem.isDirectory(file) && file.endsWith(ext))
 							{
 								var fileToCheck:String = file.substr(0, file.length - ext.length);
 
@@ -1442,6 +1470,34 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
+			#else
+			for (file in Paths.readDirectory(directory))
+			{
+				var path = haxe.io.Path.join([directory, file]);
+				for (ext in exts)
+				{
+					if (file.endsWith(ext))
+					{
+						var fileToCheck:String = file.substr(0, file.length - ext.length);
+
+						if (!noteTypeMap.exists(fileToCheck))
+						{
+							displayNameList.push(fileToCheck);
+							noteTypeMap.set(fileToCheck, key);
+							noteTypeIntMap.set(key, fileToCheck);
+
+							if (ext != '.lua')
+							{
+								var script = FunkinIris.fromFile(path, fileToCheck);
+								notetypeScripts.set(fileToCheck, script);
+							}
+
+							key++;
+						}
+					}
+				}
+			}
+			#end
 		}
 
 		for (i in 1...displayNameList.length)
@@ -1491,21 +1547,20 @@ class ChartingState extends MusicBeatState
 		#end
 
 		var eventexts = ['.txt', '.hx', '.hxs', '.hscript'];
-		var removeShit = [4, 3, 4, 8];
 
-		for (i in 0...directories.length)
+		for (directory in directories)
 		{
-			var directory:String = directories[i];
+			#if MODS_ALLOWED
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in Paths.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
-					for (ext in 0...eventexts.length)
+					for (ext in eventexts)
 					{
-						if (!FileSystem.isDirectory(path) && file != 'readme.txt' && file.endsWith(eventexts[ext]))
+						if (!FileSystem.isDirectory(path) && file != 'readme.txt' && file.endsWith(ext))
 						{
-							var fileToCheck:String = file.substr(0, file.length - removeShit[ext]);
+							var fileToCheck:String = file.substr(0, file.length - ext.length);
 							if (!eventPushedMap.exists(fileToCheck))
 							{
 								eventPushedMap.set(fileToCheck, true);
@@ -1528,6 +1583,37 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
+			#else
+			for (file in Paths.readDirectory(directory))
+			{
+				var path = haxe.io.Path.join([directory, file]);
+				for (ext in eventexts)
+				{
+					if (file != 'readme.txt' && file.endsWith(ext))
+					{
+						var fileToCheck:String = file.substr(0, file.length - ext.length);
+						if (!eventPushedMap.exists(fileToCheck))
+						{
+							eventPushedMap.set(fileToCheck, true);
+							for (x in ['.hx', '.hxs', '.hscript'])
+							{
+								if (file.endsWith(x))
+								{
+									eventStuff.push([fileToCheck, 'scripted description']);
+									break;
+								}
+								else
+								{
+									eventStuff.push([fileToCheck, File.getContent(path)]);
+									break;
+								}
+							}
+						}
+						break;
+					}
+				}
+			}
+			#end
 		}
 		eventPushedMap.clear();
 		eventPushedMap = null;
@@ -4133,3 +4219,4 @@ class ChartingOptionsSubmenu extends MusicBeatSubstate
 		trace(menuItems[curSelected]);
 	}
 }
+#end

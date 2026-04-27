@@ -589,34 +589,31 @@ class PlayState extends MusicBeatState
 		
 		for (folder in foldersToCheck)
 		{
-			if (FileSystem.exists(folder))
+			for (file in Paths.readDirectory(folder))
 			{
-				for (file in FileSystem.readDirectory(folder))
+				if (!filesPushed.contains(file))
 				{
-					if (!filesPushed.contains(file))
+					#if LUA_ALLOWED
+					if (Paths.fileExists(file) && file.endsWith('.lua'))
 					{
-						if (file.endsWith('.lua'))
+						var script = new FunkinLua(folder + file);
+						luaArray.push(script);
+						funkyScripts.push(script);
+						filesPushed.push(file);
+					}
+					else
+					#end
+					{
+						for (ext in FunkinIris.exts)
 						{
-							#if LUA_ALLOWED
-							var script = new FunkinLua(folder + file);
-							luaArray.push(script);
-							funkyScripts.push(script);
-							filesPushed.push(file);
-							#end
-						}
-						else
-						{
-							for (ext in FunkinIris.exts)
+							if (Paths.fileExists(file) && file.endsWith('.$ext'))
 							{
-								if (file.endsWith('.$ext'))
+								var script = initFunkinIris(folder + file);
+								if (script != null)
 								{
-									var script = initFunkinIris(folder + file);
-									if (script != null)
-									{
-										filesPushed.push(file);
-									}
-									break;
+									filesPushed.push(file);
 								}
+								break;
 							}
 						}
 					}
@@ -770,11 +767,11 @@ class PlayState extends MusicBeatState
 		callOnLuas('onCreate', []);
 		
 		startingSong = true;
-		
+
 		// SONG SPECIFIC SCRIPTS
 		var filesPushed:Array<String> = [];
 		var foldersToCheck:Array<String> = [Paths.getSharedPath('songs/' + Paths.formatToSongPath(SONG.song) + '/')];
-		
+
 		#if MODS_ALLOWED
 		foldersToCheck.insert(0, Paths.mods('songs/' + Paths.formatToSongPath(SONG.song) + '/'));
 		if (Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0) foldersToCheck.insert(0,
@@ -783,16 +780,17 @@ class PlayState extends MusicBeatState
 		for (mod in Paths.getGlobalMods())
 			foldersToCheck.insert(0, Paths.mods(mod + '/songs/' + Paths.formatToSongPath(SONG.song) + '/')); // using push instead of insert because these should run after everything else
 		#end
-		
+
 		for (folder in foldersToCheck)
 		{
+			#if MODS_ALLOWED
 			if (FileSystem.exists(folder))
 			{
-				for (file in FileSystem.readDirectory(folder))
+				for (file in Paths.readDirectory(folder))
 				{
 					if (!filesPushed.contains(file))
 					{
-						if (file.endsWith('.lua'))
+						if (!FileSystem.isDirectory(file) && file.endsWith('.lua'))
 						{
 							#if LUA_ALLOWED
 							var script = new FunkinLua(folder + file);
@@ -805,7 +803,7 @@ class PlayState extends MusicBeatState
 						{
 							for (ext in FunkinIris.exts)
 							{
-								if (file.endsWith('.$ext'))
+								if (!FileSystem.isDirectory(file) && file.endsWith('.$ext'))
 								{
 									var sc = initFunkinIris(folder + file);
 									if (sc != null)
@@ -819,6 +817,38 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
+			#else
+			for (file in Paths.readDirectory(folder))
+			{
+				if (!filesPushed.contains(file))
+				{
+					if (file.endsWith('.lua'))
+					{
+						#if LUA_ALLOWED
+						var script = new FunkinLua(folder + file);
+						luaArray.push(script);
+						funkyScripts.push(script);
+						filesPushed.push(file);
+						#end
+					}
+					else
+					{
+						for (ext in FunkinIris.exts)
+						{
+							if (file.endsWith('.$ext'))
+							{
+								var sc = initFunkinIris(folder + file);
+								if (sc != null)
+								{
+									filesPushed.push(file);
+								}
+								break;
+							}
+						}
+					}
+				}
+			}
+			#end
 		}
 		
 		if (songStartCallback == null)
@@ -870,14 +900,14 @@ class PlayState extends MusicBeatState
 		
 		refreshZ(stage);
 	}
-	
+
 	function noteskinLoading(skin:String = 'default')
 	{
-		if (FileSystem.exists(Paths.modsNoteskin(skin))) noteSkin = new NoteSkinHelper(Paths.modsNoteskin(skin));
-		else if (FileSystem.exists(Paths.noteskin(skin))) noteSkin = new NoteSkinHelper(Paths.noteskin(skin));
-		
+		if (OpenFlAssets.exists(Paths.modsNoteskin(skin))) noteSkin = new NoteSkinHelper(Paths.modsNoteskin(skin));
+		else if (OpenFlAssets.exists(Paths.noteskin(skin))) noteSkin = new NoteSkinHelper(Paths.noteskin(skin));
+
 		arrowSkin = skin;
-		
+
 		noteSkin ??= new NoteSkinHelper(Paths.noteskin('default'));
 	}
 	
@@ -1091,39 +1121,40 @@ class PlayState extends MusicBeatState
 		char.x += char.positionArray[0];
 		char.y += char.positionArray[1];
 	}
-	
+
 	public function startVideo(name:String):Void
 	{
-	#if VIDEOS_ALLOWED
-	var foundFile:Bool = false;
-	var fileName:String = #if MODS_ALLOWED Paths.modFolders('videos/' + name + '.' + Paths.VIDEO_EXT); #else ''; #end
-	#if sys
-	if (FileSystem.exists(fileName))
-	{
-		foundFile = true;
-	}
-	#end
-	
-	if (!foundFile)
-	{
-		fileName = Paths.video(name);
-		#if sys
+		#if VIDEOS_ALLOWED
+		var foundFile:Bool = false;
+		var fileName:String = "";
+
+		#if MODS_ALLOWED
+		fileName = Paths.modFolders('videos/$name.${Paths.VIDEO_EXT}');
+
 		if (FileSystem.exists(fileName))
-		{
-		#else
-		if (OpenFlAssets.exists(fileName))
-		{
-		#end
 			foundFile = true;
+		#end
+
+		if (!foundFile)
+		{
+			fileName = Paths.video(name);
+			#if MODS_ALLOWED
+			if (FileSystem.exists(fileName))
+			#else
+			if (OpenFlAssets.exists(fileName))
+			#end
+				foundFile = true;
 		}
-		} if (foundFile)
+
+		if (foundFile)
 		{
 			inCutscene = true;
 			var bg = new funkin.states.transitions.FadeTransition.FixedFlxBGSprite();
 			bg.scrollFactor.set();
 			bg.cameras = [camHUD];
 			add(bg);
-			var vid = new FlxVideo();
+
+			var vid = new hxvlc.flixel.FlxVideo();
 			vid.onEndReached.add(() -> {
 				remove(bg);
 				vid.dispose();
@@ -1642,7 +1673,10 @@ class PlayState extends MusicBeatState
 			for (songNotes in section.sectionNotes)
 			{
 				var type:Dynamic = songNotes[3];
+
+				#if EDITORS_ALLOWED
 				if (!Std.isOfType(type, String)) type = ChartingState.noteTypeList[type];
+				#end
 				
 				if (!noteTypeMap.exists(type))
 				{
@@ -1666,8 +1700,9 @@ class PlayState extends MusicBeatState
 				var files = [#if MODS_ALLOWED Paths.modFolders(baseFile), #end Paths.getSharedPath(baseFile)];
 				for (file in files)
 				{
-					if (FileSystem.exists(file))
+					if (OpenFlAssets.exists(file))
 					{
+						#if LUA_ALLOWED
 						if (ext == LUA)
 						{
 							var script = new FunkinLua(file, notetype);
@@ -1677,6 +1712,7 @@ class PlayState extends MusicBeatState
 							doPush = true;
 						}
 						else
+						#end
 						{
 							var script = initFunkinIris(file, notetype);
 							if (script != null)
@@ -1713,8 +1749,9 @@ class PlayState extends MusicBeatState
 				var files = [#if MODS_ALLOWED Paths.modFolders(baseFile), #end Paths.getSharedPath(baseFile)];
 				for (file in files)
 				{
-					if (FileSystem.exists(file))
+					if (OpenFlAssets.exists(file))
 					{
+						#if LUA_ALLOWED
 						if (ext == LUA)
 						{
 							var script = new FunkinLua(file, event);
@@ -1726,6 +1763,7 @@ class PlayState extends MusicBeatState
 							doPush = true;
 						}
 						else
+						#end
 						{
 							var script = initFunkinIris(file, event);
 							if (script != null)
@@ -1740,7 +1778,7 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		
+
 		for (subEvent in getEvents())
 		{
 			subEvent.strumTime -= eventNoteEarlyTrigger(subEvent);
@@ -1751,9 +1789,9 @@ class PlayState extends MusicBeatState
 		{ // No need to sort if there's a single one or none at all
 			eventNotes.sort(sortByTime);
 		}
-		
+
 		speedChanges.sort(svSort);
-		
+
 		var lastBFNotes:Array<Note> = [null, null, null, null];
 		var lastDadNotes:Array<Note> = [null, null, null, null];
 		// Should populate these w/ nulls depending on keycount -neb
@@ -1763,16 +1801,16 @@ class PlayState extends MusicBeatState
 			{
 				var daStrumTime:Float = songNotes[0];
 				var daNoteData:Int = Std.int(songNotes[1] % SONG.keys);
-				
+
 				var gottaHitNote:Bool = section.mustHitSection;
-				
+
 				if (songNotes[1] > (SONG.keys - 1))
 				{
 					gottaHitNote = !section.mustHitSection;
 				}
 				{
 					var realTime = daStrumTime + ClientPrefs.noteOffset;
-					
+
 					var last = (gottaHitNote ? lastBFNotes : lastDadNotes)[daNoteData];
 					if (last != null)
 					{
@@ -1782,18 +1820,21 @@ class PlayState extends MusicBeatState
 						}
 					}
 				}
-				
+
 				var oldNote:Note = null;
-				
+
 				var pixelStage = isPixelStage;
 				// var skin = arrowSkin;
-				
+
 				var type:Dynamic = songNotes[3];
+
+				#if EDITORS_ALLOWED
 				if (!Std.isOfType(type, String)) type = ChartingState.noteTypeList[type];
-				
+				#end
+
 				// TODO: maybe make a checkNoteType n shit but idfk im lazy
 				// or maybe make a "Transform Notes" event which'll make notes which don't change texture change into the specified one
-				
+
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, false, gottaHitNote ? 0 : 1);
 				swagNote.row = Conductor.secsToRow(daStrumTime);
 				var rowArray = noteRows[gottaHitNote ? 0 : 1];
@@ -1809,7 +1850,7 @@ class PlayState extends MusicBeatState
 				{
 					lastDadNotes[daNoteData] = swagNote;
 				}
-				
+
 				var dataToCheck:Int = songNotes[1];
 				if (songData.lanes > 1)
 				{
@@ -1819,21 +1860,22 @@ class PlayState extends MusicBeatState
 					if (dataToCheck > Std.int((SONG.keys * 2) - 1)) swagNote.lane = Std.int(Math.max(Math.floor(dataToCheck / SONG.keys), -1));
 				}
 				else swagNote.lane = 0;
-				
+
 				swagNote.gfNote = (section.gfSection && (songNotes[1] < SONG.keys));
-				
+
 				swagNote.noteType = type;
-				
+
 				swagNote.scrollFactor.set();
 				// swagNote.player = gottaHitNote ? 0 : 1;
-				
+
 				var susLength:Float = swagNote.sustainLength;
-				
+
 				susLength = susLength / Conductor.stepCrotchet;
 				swagNote.ID = unspawnNotes.length;
 				modchartObjects.set('note${swagNote.ID}', swagNote);
 				unspawnNotes.push(swagNote);
-				
+
+				#if LUA_ALLOWED
 				if (swagNote.noteScript != null && swagNote.noteScript.scriptType == LUA)
 				{
 					callScript(swagNote.noteScript, 'setupNote', [
@@ -1844,6 +1886,7 @@ class PlayState extends MusicBeatState
 						swagNote.ID
 					]);
 				}
+				#end
 				
 				var floorSus:Int = Math.round(susLength);
 				if (floorSus > 0)
@@ -1868,6 +1911,8 @@ class PlayState extends MusicBeatState
 						sustainNote.parent = swagNote;
 						// sustainNote.player = sustainNote.parent.player;
 						unspawnNotes.push(sustainNote);
+
+						#if LUA_ALLOWED
 						if (sustainNote.noteScript != null && sustainNote.noteScript.scriptType == LUA)
 						{
 							callScript(sustainNote.noteScript, 'setupNote', [
@@ -1878,6 +1923,7 @@ class PlayState extends MusicBeatState
 								sustainNote.ID
 							]);
 						}
+						#end
 						
 						if (sustainNote.mustPress)
 						{
@@ -2130,11 +2176,11 @@ class PlayState extends MusicBeatState
 				FlxG.sound.music.pause();
 				vocals.pause();
 			}
-			
+
 			onPauseSignal.dispatch();
 			FlxTimer.globalManager.forEach((i:FlxTimer) -> if (!i.finished) i.active = false);
 			FlxTween.globalManager.forEach((i:FlxTween) -> if (!i.finished) i.active = false);
-			
+
 			@:privateAccess
 			{
 				for (i in funkin.objects.video.FunkinVideoSprite._videos)
@@ -2323,18 +2369,14 @@ class PlayState extends MusicBeatState
 				#end
 			}
 		}
-		
-		#if !RELEASE_BUILD
+
+		#if EDITORS_ALLOWED
 		if (FlxG.keys.anyJustPressed(debugKeysChart) && !endingSong && !inCutscene)
-		{
 			openChartEditor();
-		}
-		
+
 		if (FlxG.keys.justPressed.NINE)
-		{
 			openNoteskinEditor();
-		}
-		
+
 		if (FlxG.keys.anyJustPressed(debugKeysCharacter) && !endingSong && !inCutscene)
 		{
 			persistentUpdate = false;
@@ -2403,11 +2445,15 @@ class PlayState extends MusicBeatState
 			{
 				var dunceNote:Note = unspawnNotes[0];
 				var doSpawn:Bool = true;
+
+				#if LUA_ALLOWED
 				if (dunceNote.noteScript != null && dunceNote.noteScript.scriptType == LUA)
-				{
 					doSpawn = callScript(dunceNote.noteScript, "spawnNote", [dunceNote]) != Globals.Function_Stop;
-				}
-				if (doSpawn) doSpawn = callOnHScripts('onSpawnNote', [dunceNote]) != Globals.Function_Stop;
+				#end
+
+				if (doSpawn)
+					doSpawn = callOnHScripts('onSpawnNote', [dunceNote]) != Globals.Function_Stop;
+
 				if (doSpawn)
 				{
 					var desiredPlayfield = playFields.members[dunceNote.lane];
@@ -2462,6 +2508,7 @@ class PlayState extends MusicBeatState
 					if (dunceNote.noteScript != null)
 					{
 						var script:Dynamic = dunceNote.noteScript;
+						#if LUA_ALLOWED
 						if (script.scriptType == LUA)
 						{
 							callScript(script, 'postSpawnNote', [
@@ -2473,9 +2520,8 @@ class PlayState extends MusicBeatState
 							]);
 						}
 						else
-						{
+						#end
 							callScript(script, "postSpawnNote", [dunceNote]);
-						}
 					}
 				}
 				else
@@ -2676,36 +2722,38 @@ class PlayState extends MusicBeatState
 		setOnScripts('botPlay', cpuControlled);
 		callOnScripts('onUpdatePost', [elapsed]);
 	}
-	
+
+	#if EDITORS_ALLOWED
 	function openChartEditor()
 	{
 		persistentUpdate = false;
 		paused = true;
 		cancelMusicFadeTween();
-		
+
 		FlxG.switchState(new ChartingState());
 		chartingMode = true;
-		
-		#if desktop
+
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Chart Editor", null, null, true);
 		#end
 	}
-	
+
 	function openNoteskinEditor()
 	{
 		persistentUpdate = false;
 		paused = true;
 		cancelMusicFadeTween();
-		
+
 		FlxG.switchState(new NoteSkinEditor(((ClientPrefs.noteSkin.contains('Quant')
 			&& noteSkin.data.hasQuants) ? 'QUANT${SONG.arrowSkin}' : SONG.arrowSkin), noteSkin));
 		chartingMode = true;
-		
-		#if desktop
+
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Noteskin Editor", null, null, true);
 		#end
 	}
-	
+	#end
+
 	public function updateScoreBar(miss:Bool = false)
 	{
 		final scoreRetVal:Dynamic = callOnScripts('onUpdateScore', [miss]);
@@ -3404,13 +3452,13 @@ class PlayState extends MusicBeatState
 			}
 		}
 		#end
-		
+
 		#if LUA_ALLOWED
 		final ret:Dynamic = callOnScripts('onEndSong', []);
 		#else
 		final ret:Dynamic = Globals.Function_Continue;
 		#end
-		
+
 		if (ret != Globals.Function_Stop && !transitioning)
 		{
 			if (SONG.validScore)
@@ -3421,13 +3469,15 @@ class PlayState extends MusicBeatState
 				Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
 				#end
 			}
-			
+
+			#if EDITORS_ALLOWED
 			if (chartingMode)
 			{
 				openChartEditor();
 				return;
 			}
-			
+			#end
+
 			if (isStoryMode)
 			{
 				campaignScore += songScore;
@@ -3877,6 +3927,7 @@ class PlayState extends MusicBeatState
 		if (daNote.noteScript != null)
 		{
 			var script:Dynamic = daNote.noteScript;
+			#if LUA_ALLOWED
 			if (script.scriptType == LUA)
 			{
 				callScript(script, 'noteMiss', [
@@ -3888,9 +3939,8 @@ class PlayState extends MusicBeatState
 				]);
 			}
 			else
-			{
+			#end
 				callScript(script, "noteMiss", [daNote]);
-			}
 		}
 	}
 	
@@ -4060,14 +4110,12 @@ class PlayState extends MusicBeatState
 		if (note.noteScript != null)
 		{
 			var script:Dynamic = note.noteScript;
+			#if LUA_ALLOWED
 			if (script.scriptType == LUA)
-			{
 				callScript(script, 'opponentNoteHit', luaArgs);
-			}
 			else
-			{
+			#end
 				callScript(script, "opponentNoteHit", hscriptArgs);
-			}
 		}
 		if (!note.isSustainNote)
 		{
@@ -4253,14 +4301,12 @@ class PlayState extends MusicBeatState
 			if (note.noteScript != null)
 			{
 				var script:Dynamic = note.noteScript;
+				#if LUA_ALLOWED
 				if (script.scriptType == LUA)
-				{
 					callScript(script, 'goodNoteHit', luaArgs);
-				}
 				else
-				{
+				#end
 					callScript(script, "goodNoteHit", hscriptArgs);
-				}
 			}
 			if (!note.isSustainNote)
 			{
@@ -4447,14 +4493,12 @@ class PlayState extends MusicBeatState
 			if (note.noteScript != null)
 			{
 				var script:Dynamic = note.noteScript;
+				#if LUA_ALLOWED
 				if (script.scriptType == LUA)
-				{
 					callScript(script, 'extraNoteHit', luaArgs);
-				}
 				else
-				{
+				#end
 					callScript(script, "extraNoteHit", hscriptArgs);
-				}
 			}
 			if (!note.isSustainNote)
 			{
@@ -4465,7 +4509,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 	}
-	
+
 	function spawnNoteSplashOnNote(note:Note)
 	{
 		if (ClientPrefs.noteSplashes && note != null)
@@ -4525,13 +4569,13 @@ class PlayState extends MusicBeatState
 		cover.setupNoteCover(x + script_COVERLOOPOffsets[data].x, y + script_COVERLOOPOffsets[data].y, data, skin, hue, sat, brt, note.playField, note);
 		grpNoteCovers.add(cover);
 	}
-	
+
 	override function refreshZ(?group:FlxTypedGroup<FlxBasic>)
 	{
 		group ??= stage;
 		group.sort(CoolUtil.sortByZ, flixel.util.FlxSort.ASCENDING);
 	}
-	
+
 	var preventLuaRemove:Bool = false;
 	
 	override function destroy()
@@ -4738,7 +4782,7 @@ class PlayState extends MusicBeatState
 		
 		return returnVal;
 	}
-	
+
 	public function setOnScripts(variable:String, arg:Dynamic, ?scriptArray:Array<Dynamic>)
 	{
 		if (scriptArray == null) scriptArray = funkyScripts;
@@ -4747,23 +4791,25 @@ class PlayState extends MusicBeatState
 			script.set(variable, arg);
 		}
 	}
-	
+
 	// currently from my knowledge lua does not work like at all lol so we need to look into that later
 	function callEventScript(scriptName:String, func:String, args:Array<Dynamic>, ?luaArgs:Array<Dynamic>):Dynamic
 	{
 		if (!eventScripts.exists(scriptName)) return Globals.Function_Continue;
-		
+
 		var script = eventScripts.get(scriptName);
 		if (luaArgs == null) luaArgs = args;
-		
+
+		#if LUA_ALLOWED
 		if (script.scriptType == LUA) return callScript(script, func, luaArgs);
-		
+		#end
+
 		return callScript(script, func, args);
 	}
-	
+
 	// data todo make a callNoteScript!
 	function callNoteTypeScript() {}
-	
+
 	public function callScript(script:Dynamic, event:String, args:Array<Dynamic>):Dynamic
 	{
 		if (script is FunkinScript)

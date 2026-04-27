@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+#if EDITORS_ALLOWED
 import funkin.data.*;
 import funkin.objects.*;
 import flixel.FlxObject;
@@ -94,16 +95,20 @@ class NoteSkinEditor extends MusicBeatState
 		setupHelper(path, oh);		
 	}
 
-	function helperLoading(n)
+	function helperLoading(n):NoteSkinHelper
 	{
 		var noteskin:NoteSkinHelper = null;
 
-		if (FileSystem.exists(Paths.modsNoteskin(n)))
+		#if MODS_ALLOWED
+		if (sys.FileSystem.exists(Paths.modsNoteskin(n)))
 			noteskin = new NoteSkinHelper(Paths.modsNoteskin(n));
-		else if (FileSystem.exists(Paths.noteskin(n)))
+		else
+		#end
+		if (openfl.utils.Assets.exists(Paths.noteskin(n)))
 			noteskin = new NoteSkinHelper(Paths.noteskin(n));
 
-		noteskin ??= new NoteSkinHelper(Paths.noteskin('default'));
+		if (noteskin == null)
+			noteskin = new NoteSkinHelper(Paths.noteskin('default'));
 
 		return noteskin;
 	}
@@ -1231,29 +1236,28 @@ class NoteSkinEditor extends MusicBeatState
 
 		// #if MODS_ALLOWED
 		skinList = [];
-		var directories:Array<String> = [
-			Paths.mods('noteskins/'),
-			Paths.mods(Paths.currentModDirectory + '/noteskins/'),
-			Paths.getSharedPath('noteskins/')
-		];
+		var directories:Array<String> = [Paths.getSharedPath('noteskins/')];
+
+		#if MODS_ALLOWED
+		directories.push(Paths.mods(Paths.currentModDirectory + '/noteskins/'));
+		directories.push(Paths.mods('noteskins/'));
+
 		for (mod in Paths.getGlobalMods())
 			directories.push(Paths.mods(mod + '/noteskins/'));
-		for (i in 0...directories.length)
+		#end
+
+		for (directory in directories)
 		{
-			var directory:String = directories[i];
-			if (FileSystem.exists(directory))
+			for (file in Paths.readDirectory(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				var path = haxe.io.Path.join([directory, file]);
+				if (file.endsWith('.json'))
 				{
-					var path = haxe.io.Path.join([directory, file]);
-					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json'))
+					var charToCheck:String = file.substr(0, file.length - 5);
+					if (!skinsLoaded.exists(charToCheck))
 					{
-						var charToCheck:String = file.substr(0, file.length - 5);
-						if (!skinsLoaded.exists(charToCheck))
-						{
-							skinList.push(charToCheck);
-							skinsLoaded.set(charToCheck, true);
-						}
+						skinList.push(charToCheck);
+						skinsLoaded.set(charToCheck, true);
 					}
 				}
 			}
@@ -1361,3 +1365,4 @@ class NoteSkinEditor extends MusicBeatState
 		}
 	}
 }
+#end

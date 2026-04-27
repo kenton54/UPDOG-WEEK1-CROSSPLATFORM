@@ -35,7 +35,7 @@ class MusicBeatSubstate extends FlxSubState
 
 		var scriptFile = FunkinIris.getPath('scripts/menus/substates/$scriptName', false);
 
-		if (FileSystem.exists(scriptFile))
+		if (openfl.utils.Assets.exists(scriptFile))
 		{
 			script = OverrideStateScript.fromFile(scriptFile);
 			trace('$scriptName script [$scriptFile] found!');

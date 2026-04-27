@@ -66,7 +66,7 @@ class MusicBeatState extends FlxUIState
 
 		var scriptFile = FunkinIris.getPath('scripts/menus/$scriptName', false);
 
-		if (FileSystem.exists(scriptFile))
+		if (openfl.utils.Assets.exists(scriptFile))
 		{
 			script = OverrideStateScript.fromFile(scriptFile);
 			trace('$scriptName script [$scriptFile] found!');
@@ -100,7 +100,7 @@ class MusicBeatState extends FlxUIState
 
 	}
 
-	public function refreshZ(?group:FlxTypedGroup<FlxBasic>)
+	public function refreshZ(?group:FlxTypedGroup<flixel.FlxBasic>)
 	{
 		group ??= FlxG.state;
 		group.sort(CoolUtil.sortByZ, flixel.util.FlxSort.ASCENDING);

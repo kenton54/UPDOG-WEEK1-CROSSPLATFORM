@@ -63,13 +63,13 @@ class AlphaModifier extends NoteModifier
 
 		if (getSubmodValue("hidden", player) != 0)
 		{
-			var hiddenAdjust = CoolUtil.clamp(CoolUtil.scale(yPos, getHiddenStart(player), getHiddenEnd(player), 0, -1), -1, 0);
+			var hiddenAdjust = FlxMath.bound(CoolUtil.scale(yPos, getHiddenStart(player), getHiddenEnd(player), 0, -1), -1, 0);
 			alpha += getSubmodValue("hidden", player) * hiddenAdjust;
 		}
 
 		if (getSubmodValue("sudden", player) != 0)
 		{
-			var suddenAdjust = CoolUtil.clamp(CoolUtil.scale(yPos, getSuddenStart(player), getSuddenEnd(player), 0, -1), -1, 0);
+			var suddenAdjust = FlxMath.bound(CoolUtil.scale(yPos, getSuddenStart(player), getSuddenEnd(player), 0, -1), -1, 0);
 			alpha += getSubmodValue("sudden", player) * suddenAdjust;
 		}
 
@@ -88,19 +88,19 @@ class AlphaModifier extends NoteModifier
 			alpha += CoolUtil.scale(Math.abs(distFromCenter), realFadeDist, 2 * realFadeDist, -1, 0) * getSubmodValue("randomVanish", player);
 		}
 
-		return CoolUtil.clamp(alpha + 1, 0, 1);
+		return FlxMath.bound(alpha + 1, 0, 1);
 	}
 
 	function getGlow(visible:Float)
 	{
 		var glow = CoolUtil.scale(visible, 1, 0.5, 0, 1.3);
-		return CoolUtil.clamp(glow, 0, 1);
+		return FlxMath.bound(glow, 0, 1);
 	}
 
 	function getAlpha(visible:Float)
 	{
 		var alpha = CoolUtil.scale(visible, 0.5, 0, 1, 0);
-		return CoolUtil.clamp(alpha, 0, 1);
+		return FlxMath.bound(alpha, 0, 1);
 	}
 
 	override function shouldExecute(player:Int, val:Float) return true;

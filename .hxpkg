@@ -29,11 +29,10 @@
 			},
 			{
 				"name": "hxcpp",
-				"link": "https://github.com/HaxeFoundation/hxcpp"
+				"link": "https://github.com/FunkinCrew/hxcpp"
 			},
 			{
-				"name": "hxvlc",
-				"version": "2.1.2"
+				"name": "hxvlc"
 			},
 			{
 				"name": "lime",
@@ -47,8 +46,16 @@
 				"link": "https://github.com/superpowers04/linc_luajit.git"
 			},
 			{
-				"name": "discord_rpc",
-				"link": "https://github.com/Aidan63/linc_discord-rpc"
+				"name": "hxdiscord_rpc"
+			},
+			{
+				"name": "hxp"
+			},
+			{
+				"name": "format"
+			},
+			{
+				"name": "hxgamemode"
 			}
 		]
 	}

@@ -8,7 +8,7 @@ class OverrideStateScript extends FunkinIris
 	{
 		if (name == null) name = file;
 
-		return new OverrideStateScript(File.getContent(file), name, additionalVars);
+		return new OverrideStateScript(#if MODS_ALLOWED sys.io.File.getContent(file) #else openfl.utils.Assets.getText(file) #end, name, additionalVars);
 	}
 
 	public function new(script:String, ?name:String = "Script", ?custom:Bool = true, ?additionalVars:Map<String, Any>)
@@ -19,7 +19,7 @@ class OverrideStateScript extends FunkinIris
 
 		trace('is [$name] custom? [$customMenu]');
 
-		set("state", flixel.FlxG.state);
+		set("state", FlxG.state);
 		set("add", FlxG.state.add);
 		set("remove", FlxG.state.remove);
 		set("insert", FlxG.state.insert);

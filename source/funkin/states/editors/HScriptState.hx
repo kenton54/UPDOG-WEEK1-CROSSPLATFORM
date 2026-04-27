@@ -1,12 +1,8 @@
 package funkin.states.editors;
 
-#if sys
-import sys.io.File;
-#end
-
 class HScriptState extends MusicBeatState
 {
-	public var instance:HScriptState;
+	public static var instance:HScriptState;
 
 	public static var currentGlobalScript:String;
 

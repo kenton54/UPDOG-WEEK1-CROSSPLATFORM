@@ -1,5 +1,4 @@
-package source.funkin;
-
+package funkin;
 
 #if !macro
 import extensions.*;

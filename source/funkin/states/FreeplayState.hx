@@ -20,6 +20,8 @@ import funkin.backend.FunkinShader.FunkinRuntimeShader;
 import funkin.utils.DifficultyUtil;
 import funkin.states.substates.GameplayChangersSubstate;
 
+import openfl.utils.Assets;
+
 class FreeplayState extends MusicBeatState
 {
 	public static var curWeek:Int = 0;
@@ -160,12 +162,12 @@ class FreeplayState extends MusicBeatState
 		refreshDiffText();
 		super.create();
 	}
-	
+
 	function createShader(fragFile:String = null, vertFile:String = null):FunkinRuntimeShader
 	{
-		return new FunkinRuntimeShader(fragFile == null ? null : File.getContent(Paths.modsShaderFragment(fragFile)));
+		return new FunkinRuntimeShader(fragFile == null ? null : Assets.getText(Paths.modsShaderFragment(fragFile)));
 	}
-	
+
 	function reloadWeekShit()
 	{
 		var i = curWeek;

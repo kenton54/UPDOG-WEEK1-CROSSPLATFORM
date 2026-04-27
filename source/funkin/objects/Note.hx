@@ -18,9 +18,6 @@ import funkin.data.scripts.*;
 import funkin.objects.shader.*;
 import funkin.objects.Character;
 import math.Vector3;
-#if sys
-import sys.FileSystem;
-#end
 
 using StringTools;
 
@@ -285,8 +282,12 @@ class Note extends FlxSprite
 					alpha = 0.8;
 					color = 0xffa19f9f;
 				default:
-					if (!inEditor) noteScript = PlayState.instance.notetypeScripts.get(value);
-					else noteScript = ChartingState.instance.notetypeScripts.get(value);
+					if (!inEditor)
+						noteScript = PlayState.instance.notetypeScripts.get(value);
+					#if EDITORS_ALLOWED
+					else
+						noteScript = ChartingState.instance.notetypeScripts.get(value);
+					#end
 
 					if (noteScript != null && noteScript.scriptType == HSCRIPT)
 					{
@@ -322,6 +323,7 @@ class Note extends FlxSprite
 			if (prevNote != null && isSustainNote) quant = prevNote.quant;
 			else quant = getQuant(beat);
 		}
+
 		this.inEditor = inEditor;
 
 		x += (ClientPrefs.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
@@ -530,18 +532,20 @@ class Note extends FlxSprite
 
 		if (animName != null) animation.play(animName, true);
 
+		#if EDITORS_ALLOWED
 		if (inEditor && !skipScale)
 		{
-			setGraphicSize(ChartingState.GRID_SIZE, ChartingState.GRID_SIZE);
+			setGraphicSize(ChartingState.GRID_SIZE);
 			updateHitbox();
 			baseScaleX = scale.x;
 			baseScaleY = scale.y;
 		}
+		#end
 
 		antialiasing = handler.data.antialiasing;
-		if(handler.data.antialiasing)
-			antialiasing = ClientPrefs.globalAntialiasing;
 
+		if (handler.data.antialiasing)
+			antialiasing = ClientPrefs.globalAntialiasing;
 
 		if (noteScript != null && noteScript.scriptType == HSCRIPT)
 		{

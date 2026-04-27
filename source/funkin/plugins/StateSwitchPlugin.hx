@@ -1,5 +1,6 @@
 package funkin.plugins;
 
+#if (!RELEASE_BUILD && EDITORS_ALLOWED)
 import funkin.backend.PlayerSettings;
 import funkin.states.editors.CharacterEditorState;
 import funkin.states.editors.ChartingState;
@@ -72,3 +73,4 @@ class DebugState extends FlxState
 		}
 	}
 }
+#end

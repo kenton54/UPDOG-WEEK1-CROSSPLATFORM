@@ -1,6 +1,6 @@
 package funkin.data;
 
-import openfl.Assets;
+import openfl.utils.Assets;
 import funkin.data.Section.SwagSection;
 
 import haxe.Json;
@@ -88,57 +88,47 @@ class Song
 			}
 		}
 	}
-	
-	public function new(song, notes, bpm)
+
+	public function new(song:String, notes:Array<SwagSection>, bpm:Float)
 	{
 		this.song = song;
 		this.notes = notes;
 		this.bpm = bpm;
 	}
-	
+
 	public static function loadFromJson(jsonInput:String, ?folder:String, ?mod:Bool = false):SwagSong
 	{
 		var rawJson = null;
-		
+
 		var formattedFolder:String = Paths.formatToSongPath(folder);
 		var formattedSong:String = Paths.formatToSongPath(jsonInput);
-		#if MODS_ALLOWED
-		var moddyFile:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
-		if (FileSystem.exists(moddyFile))
+
+		try
 		{
-			rawJson = File.getContent(moddyFile).trim();
+			rawJson = Assets.getText('assets/songs/$formattedFolder/$formattedSong.json'); // shitty as hell but the pathing system in this ver of the engine is annoying
 		}
-		#end
-		
-		if (rawJson == null)
+		catch (e)
 		{
-			if (mod)
+			rawJson = Assets.getText(Paths.json(formattedFolder + '/' + formattedSong)).trim();
+		}
+
+		#if MODS_ALLOWED
+		if (mod)
+		{
+			var moddyFile:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
+			if (FileSystem.exists(moddyFile))
 			{
 				rawJson = File.getContent(moddyFile).trim();
 			}
-			else
-			{
-				try
-				{
-					rawJson = openfl.Assets.getText('assets/songs/$formattedFolder/$formattedSong.json'); //shitty as hell but the pathing system in this ver of the engine is annoying
-				}
-				catch (e)
-				{
-					#if sys
-					rawJson = File.getContent(Paths.json(formattedFolder + '/' + formattedSong)).trim();
-					#else
-					rawJson = openfl.Assets.getText(Paths.json(formattedFolder + '/' + formattedSong)).trim();
-					#end
-				}
-			}
 		}
-		
+		#end
+
 		while (!rawJson.endsWith("}"))
 		{
 			rawJson = rawJson.substr(0, rawJson.length - 1);
 			// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
 		}
-		
+
 		// FIX THE CASTING ON WINDOWS/NATIVE
 		// Windows???
 		// trace(songData);
@@ -154,7 +144,7 @@ class Song
 				daNotes = songData.notes;
 				daSong = songData.song;
 				daBpm = songData.bpm; */
-		
+
 		var songJson:Dynamic = parseJSONshit(rawJson);
 		if (jsonInput != 'events') StageData.loadDirectory(songJson);
 		onLoadJson(songJson);

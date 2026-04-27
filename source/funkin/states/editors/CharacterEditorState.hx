@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+#if EDITORS_ALLOWED
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -27,11 +28,11 @@ import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import haxe.Json;
 import funkin.objects.Character;
-import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
 import lime.system.Clipboard;
 import flixel.animation.FlxAnimation;
 import funkin.objects.*;
 import funkin.data.*;
+
 #if MODS_ALLOWED
 import sys.FileSystem;
 #end
@@ -1177,12 +1178,13 @@ class CharacterEditorState extends MusicBeatState
 		];
 		for (mod in Paths.getGlobalMods())
 			directories.push(Paths.mods(mod + '/characters/'));
+
 		for (i in 0...directories.length)
 		{
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in Paths.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -1479,3 +1481,4 @@ class CharacterEditorState extends MusicBeatState
 		return text;
 	}
 }
+#end

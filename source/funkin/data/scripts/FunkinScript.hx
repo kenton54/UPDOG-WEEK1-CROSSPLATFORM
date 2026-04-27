@@ -130,6 +130,8 @@ interface IFunkinScript
 
 enum abstract ScriptType(String) to String from String
 {
+	#if LUA_ALLOWED
 	public var LUA:String = 'lua';
+	#end
 	public var HSCRIPT:String = 'hscript';
 }

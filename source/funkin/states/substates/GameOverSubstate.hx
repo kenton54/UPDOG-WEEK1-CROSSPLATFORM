@@ -25,7 +25,6 @@ class GameOverSubstate extends MusicBeatSubstate
 	var defeat:BGSprite;
 	var gameOver:BGSprite;
 	var ct:FlxSprite;
-	
 
 	var colorSwap:ColorSwap;
 	var updateCamera:Bool = false;

@@ -1,11 +1,6 @@
 package funkin.data.scripts;
 
 #if LUA_ALLOWED
-import llua.Lua;
-import llua.LuaL;
-import llua.State;
-import llua.Convert;
-#end
 import funkin.states.*;
 import flixel.FlxG;
 import flixel.addons.effects.FlxTrail;
@@ -38,6 +33,11 @@ import funkin.states.*;
 import funkin.objects.*;
 import funkin.states.substates.*;
 import funkin.objects.DialogueBoxPsych.DialogueFile;
+
+import llua.Lua;
+import llua.LuaL;
+import llua.State;
+import llua.Convert;
 
 using StringTools;
 
@@ -1882,7 +1882,7 @@ class FunkinLua extends FunkinScript
 		});
 		Lua_helper.add_callback(lua, "startVideo", function(videoFile:String) {
 			#if VIDEOS_ALLOWED
-			if (FileSystem.exists(Paths.video(videoFile)))
+			if (Assets.exists(Paths.video(videoFile)))
 			{
 				PlayState.instance.startVideo(videoFile);
 			}
@@ -2968,3 +2968,4 @@ class DebugLuaText extends FlxText
 		else if (disableTime < 1) alpha = disableTime;
 	}
 }
+#end

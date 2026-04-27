@@ -1,6 +1,6 @@
 package funkin.data.scripts;
 
-class ScriptManager extends FlxBasic
+class ScriptManager extends flixel.FlxBasic
 {
 	public static var instance:ScriptManager;
 

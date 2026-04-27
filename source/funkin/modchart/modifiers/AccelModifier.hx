@@ -37,14 +37,14 @@ class AccelModifier extends NoteModifier
 		{
 			var scale = CoolUtil.scale(visualDiff, 0, effectHeight, 0, 1);
 			var off = visualDiff * scale;
-			yAdjust += CoolUtil.clamp(brake * (off - visualDiff), -400, 400);
+			yAdjust += FlxMath.bound(brake * (off - visualDiff), -400, 400);
 		}
 
 		if (boost != 0)
 		{
 			// ((fYOffset+fEffectHeight/1.2f)/fEffectHeight);
 			var off = visualDiff * 1.5 / ((visualDiff + effectHeight / 1.2) / effectHeight);
-			yAdjust += CoolUtil.clamp(boost * (off - visualDiff), -400, 400);
+			yAdjust += FlxMath.bound(boost * (off - visualDiff), -400, 400);
 		}
 
 		yAdjust += wave * 20 * FlxMath.fastSin(visualDiff / 38);

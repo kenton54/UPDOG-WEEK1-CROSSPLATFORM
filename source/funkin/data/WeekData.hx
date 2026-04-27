@@ -1,5 +1,6 @@
 package funkin.data;
 
+import openfl.utils.Assets;
 #if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
@@ -195,7 +196,7 @@ class WeekData
 					}
 				}
 
-				for (file in FileSystem.readDirectory(directory))
+				for (file in Paths.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -240,7 +241,7 @@ class WeekData
 			rawJson = File.getContent(path);
 		}
 		#else
-		if (OpenFlAssets.exists(path))
+		if (Assets.exists(path))
 		{
 			rawJson = Assets.getText(path);
 		}

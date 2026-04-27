@@ -1,10 +1,13 @@
 package funkin.objects.video;
 
-import hxvlc.util.Location;
-
 import flixel.util.FlxSignal;
 
-import hxvlc.flixel.FlxVideoSprite;
+#if html5
+import funkin.backend.HTML5Video as VideoHandler;
+#else
+import hxvlc.util.Location;
+import hxvlc.flixel.FlxVideoSprite as VideoHandler;
+#end
 
 // a little funky but thats what happens when u gotta do weird workarounds
 // probably will do more iwth this later
@@ -31,9 +34,13 @@ import hxvlc.flixel.FlxVideoSprite;
 
  * ```
  */
-class FunkinVideoSprite extends FlxVideoSprite {
-	public static function init() {
+class FunkinVideoSprite extends VideoHandler
+{
+	public static function init()
+	{
+		#if hxvlc
 		hxvlc.util.Handle.init(['--no-lua']);
+		#end
 	}
 	
 	public static var _videos:Array<FunkinVideoSprite> = [];
@@ -77,81 +84,90 @@ class FunkinVideoSprite extends FlxVideoSprite {
 	/**
 	 * @param destroyOnFinish if true, will destroy itself on finish.
 	 */
-	public function new(x:Float = 0, y:Float = 0, destroyOnFinish:Bool = true):Void {
+	public function new(x:Float = 0, y:Float = 0, destroyOnFinish:Bool = true)
+	{
 		super(x, y);
-		
-		if (bitmap != null) {
-			bitmap.onFormatSetup.add(onReady.dispatch, false);
-			bitmap.onEndReached.add(onFinish.dispatch, false);
-			
-			bitmap.onOpening.add(() -> {
+
+		if (bitmap != null)
+		{
+			bitmap.onFormatSetup.add(onReady.dispatch);
+			bitmap.onEndReached.add(onFinish.dispatch);
+
+			bitmap.onOpening.add(() ->
+			{
 				if (!_preloaded)
 					onStart.dispatch(); // being real another option that is less hacky is all together ignore onStart and just do ur stuff when u call play
-			}, false);
-			
+			});
+
 			if (destroyOnFinish)
-				bitmap.onEndReached.add(this.destroy, true, -9999);
+				bitmap.onEndReached.add(this.destroy);
 		}
 		_videos.push(this);
 	}
-	
-	public function preload(path:Location, ?options:Array<String>):FunkinVideoSprite {
+
+	public function preload(path:String, ?options:Array<String>):FunkinVideoSprite
+	{
 		// if u didnt use path try to find the path and the extension
-		if (path is String) {
-			var stringPath:String = cast path;
-			if (!stringPath.endsWith('.mp4') && !stringPath.endsWith('.mov')) {
-				var found = false;
-				for (ext in ['mp4', 'mov']) {
-					
-					final fullPath = 'assets/videos/$stringPath.$ext'; 
-					if (FileSystem.exists(fullPath)) {
-						stringPath = fullPath;
-						found = true;
-						break;
-					}
+		var stringPath:String = path;
+		if (!stringPath.endsWith('.mp4') && !stringPath.endsWith('.mov'))
+		{
+			var found = false;
+			for (ext in ['mp4', 'mov'])
+			{
+				final fullPath = 'assets/videos/$stringPath.$ext'; 
+				if (Paths.fileExists(fullPath)) {
+					stringPath = fullPath;
+					found = true;
+					break;
 				}
-				if (found)
-					path = stringPath;
 			}
+
+			if (found)
+				path = stringPath;
 		}
-		
+
 		// essentially this is a workaround for hxvlc's inconsistent video playback
 		// sometimes its delayed and sometimes loading,playing,stopping to try to preload causes openfl texture corruption garbage
-		if (load(path, options)) {
+		if (load(path, options))
+		{
 			_preloaded = true; // im going to play a risk and assume the video does infact play
 			
-			if (play()) {
+			if (play())
+			{
 				pause();
 				visible = false;
 				if (bitmap != null)
 					bitmap.time = 0;
 			}
 		}
-		
+
 		return this;
 	}
-	
+
 	/**
 	 * Use over `play()`.
 	 */
-	public function playVideo():Void {
+	public function playVideo():Void
+	{
 		FlxTimer.wait(0, _preloaded ? _preloadPlay : play);
 	}
-	
+
 	private var _preloaded:Bool = false;
-	
-	function _preloadPlay():Void {
+
+	function _preloadPlay()
+	{
 		visible = true;
 		resume();
 		_preloaded = false;
 		onStart.dispatch();
 	}
-	
-	override function destroy():Void {
-		if (bitmap != null) {
+
+	override function destroy()
+	{
+		if (bitmap != null)
+		{
 			bitmap.onEndReached.removeAll();
 			bitmap.onFormatSetup.removeAll();
-			bitmap.onPlaying.removeAll();
 		}
 		
 		onReady.removeAll();

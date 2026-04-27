@@ -1,6 +1,11 @@
 package funkin.data;
 
-import openfl.Assets;
+import openfl.utils.Assets;
+
+#if MODS_ALLOWED
+import sys.io.File;
+import sys.FileSystem;
+#end
 
 // debating rn should we rework songs to have a general global meta
 // that decides the stage, chars
@@ -33,19 +38,23 @@ typedef MetaVariables =
 		final formattedSong = Paths.formatToSongPath(PlayState.SONG.song);
 
 		var jsonExists:Bool = false;
-		var path:String = Paths.modsJson('$formattedSong/meta');
+		var path:String = "";
+
+		#if MODS_ALLOWED
+		path = Paths.modsJson('$formattedSong/meta');
 		if (FileSystem.exists(path))
 		{
 			jsonExists = true;
 			json = haxe.Json.parse(File.getContent(path));
 		}
+		#end
 
 		// try asset dir
 		if (!jsonExists)
 		{
 			path = Paths.json('$formattedSong/meta');
-			if (FileSystem.exists(path)) json = haxe.Json.parse(File.getContent(path));
-			else if (Assets.exists(path, TEXT)) json = haxe.Json.parse(Assets.getText(path));
+			if (Assets.exists(path, TEXT))
+				json = haxe.Json.parse(Assets.getText(path));
 		}
 
 		if (json != null)
@@ -66,19 +75,23 @@ typedef MetaVariables =
 		var json:MetaVariables = null;
 
 		var jsonExists:Bool = false;
+		var path:String = "";
+
+		#if MODS_ALLOWED
 		var path:String = Paths.modFolders('$filePath.json');
 		if (FileSystem.exists(path))
 		{
 			jsonExists = true;
 			json = haxe.Json.parse(File.getContent(path));
 		}
+		#end
 
 		// try asset dir
 		if (!jsonExists)
 		{
 			path = Paths.getPath('$filePath.json', TEXT);
-			if (FileSystem.exists(path)) json = haxe.Json.parse(File.getContent(path));
-			else if (Assets.exists(path, TEXT)) json = haxe.Json.parse(Assets.getText(path));
+			if (Assets.exists(path, TEXT))
+				json = haxe.Json.parse(Assets.getText(path));
 		}
 
 		if (json != null)

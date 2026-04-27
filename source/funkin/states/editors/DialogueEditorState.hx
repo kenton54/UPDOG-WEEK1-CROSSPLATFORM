@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+#if EDITORS_ALLOWED
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.display.FlxGridOverlay;
@@ -651,3 +652,4 @@ class DialogueEditorState extends MusicBeatState
 		FlxG.log.error("Problem saving file");
 	}
 }
+#end

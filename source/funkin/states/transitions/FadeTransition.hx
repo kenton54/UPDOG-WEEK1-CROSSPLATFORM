@@ -52,7 +52,7 @@ class FixedFlxBGSprite extends FlxBGSprite
 			camera.drawPixels(frame, _matrix, colorTransform);
 
 			#if FLX_DEBUG
-			FlxBasic.visibleCount++;
+			flixel.FlxBasic.visibleCount++;
 			#end
 		}
 	}

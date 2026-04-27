@@ -1,28 +1,21 @@
 package funkin.states;
 
-import flixel.FlxSprite;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import lime.utils.Assets;
-import openfl.utils.Assets as OpenFlAssets;
-import flixel.addons.display.FlxBackdrop;
-import funkin.data.*;
 
 class FlashingState extends MusicBeatState
 {
-	public static var leftState:Bool = false;
 	var curSel = 0;
 	var warnText:FlxText;
 	var descText:FlxText;
-	var starFG:FlxBackdrop;
-	var starBG:FlxBackdrop;
 	var enabled:Array<Bool> = [true, false, true, false];
 	var goBackNum = 3; // make this the last num in the array
-	var optionShit =
-	[['Flashing Lights', 'Enables flashing lights'],
-	['Low Quality', 'Less background elements, increased performance'],
-	['Rich Presence', 'Shows the real name of the song you\'re playing'],
-	['Start Game', 'Saves settings and starts the game']];
+	var optionShit = [
+		['Flashing Lights', 'Enables flashing lights'],
+		['Low Quality', 'Less background elements, increased performance'],
+		['Rich Presence', 'Shows the real name of the song you\'re playing'],
+		['Start Game', 'Saves settings and starts the game']
+	];
 	var menuItems:FlxTypedGroup<FlxText>;
 
 	function saveOpts() {
@@ -63,15 +56,11 @@ class FlashingState extends MusicBeatState
 		trace('seldone');
 
 	}
-	function changeSel(oh:Int = 0) {
-		//if(oh != 0) FlxG.sound.play(Paths.sound('scrollMenu'), 1);
-		curSel+=oh; // Increment the thing
 
-		// if < > blah shit
-		if(curSel < 0) 
-			curSel = optionShit.length - 1;
-		if (curSel >= optionShit.length)
-			curSel = 0;
+	function changeSel(oh:Int = 0)
+	{
+		//if(oh != 0) FlxG.sound.play(Paths.sound('scrollMenu'), 1);
+		curSel = FlxMath.wrap(curSel + oh, 0, optionShit.length - 1); // Increment the thing
 
 		// Update the description..
 		descText.text = optionShit[curSel][1];
@@ -83,6 +72,7 @@ class FlashingState extends MusicBeatState
 			spr.color = (curSel == spr.ID ? 0x62E0CF : FlxColor.WHITE);
 		});		
 	}
+
 	override function update(elapsed:Float)
 	{
 		// controls shit

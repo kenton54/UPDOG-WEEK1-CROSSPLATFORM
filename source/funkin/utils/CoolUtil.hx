@@ -4,7 +4,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.math.FlxPoint;
 import flixel.FlxG;
 import openfl.utils.Assets;
-import haxe.ds.StringMap;
+
 /**
 	General Utility class for more one off functions
 **/
@@ -33,14 +33,8 @@ class CoolUtil
 	 * @param h High Boundary
 	 * @return Clamped value
 	 */
-	inline public static function clamp(n:Float, l:Float, h:Float)
-	{
-		if (n > h)
-			n = h;
-		if (n < l)
-			n = l;
-		return n;
-	}
+	inline public static function clamp(value:Float, min:Float, max:Float):Float
+		return value > max ? max : (value < min ? min : value);
 
 	/**
 	 * Creates or uses a provided point and rotates it around a given `x` and `y` by radians
@@ -71,7 +65,7 @@ class CoolUtil
 
 	//-----------------------------------------------------------------//
 
-	inline public static function sortByZ(order:Int, a:FlxBasic, b:FlxBasic):Int
+	inline public static function sortByZ(order:Int, a:flixel.FlxBasic, b:flixel.FlxBasic):Int
 	{
 		if (a == null || b == null)
 			return 0;
@@ -102,7 +96,8 @@ class CoolUtil
 	public static function coolTextFile(path:String):Array<String>
 	{
 		var daList:Array<String> = [];
-		#if sys
+
+		#if MODS_ALLOWED
 		if (FileSystem.exists(path))
 			daList = File.getContent(path).trim().split('\n');
 		else
@@ -198,7 +193,7 @@ class CoolUtil
 		Sys.command(command, [folder]);
 		trace('$command $folder');
 		#else
-		FlxG.error("Platform is not supported for CoolUtil.openFolder");
+		FlxG.log.error("Platform is not supported for CoolUtil.openFolder");
 		#end
 	}
 
@@ -233,8 +228,7 @@ class CoolUtil
 		trace(description);
 	}
 
-
-	public static final eases:StringMap<EaseFunction> = [
+	public static final eases:Map<String, EaseFunction> = [
 		"quadin" => FlxEase.quadIn,
 		"quadout" => FlxEase.quadOut,
 		"quadinout" => FlxEase.quadInOut,

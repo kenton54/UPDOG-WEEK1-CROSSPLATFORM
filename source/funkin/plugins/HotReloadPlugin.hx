@@ -1,5 +1,6 @@
 package funkin.plugins;
 
+#if !RELEASE_BUILD
 import flixel.addons.transition.FlxTransitionableState;
 
 /**
@@ -20,16 +21,17 @@ class HotReloadPlugin extends FlxBasic
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		
+
 		if (FlxG.keys.justPressed.F5)
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
 			FlxG.resetState();
 		}
-		
+
 		if (FlxG.keys.justPressed.F6)
 		{
-			FlxG.signals.preStateCreate.addOnce((state) -> {
+			FlxG.signals.preStateCreate.addOnce((state) ->
+			{
 				Paths.clearStoredMemory();
 				Paths.clearUnusedMemory();
 			});
@@ -38,3 +40,4 @@ class HotReloadPlugin extends FlxBasic
 		}
 	}
 }
+#end

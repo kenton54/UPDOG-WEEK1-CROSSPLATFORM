@@ -1,5 +1,6 @@
 package funkin.states.editors;
 
+#if EDITORS_ALLOWED
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.display.FlxGridOverlay;
@@ -952,3 +953,4 @@ class DialogueCharacterEditorState extends MusicBeatState
 		return text;
 	}
 }
+#end
