@@ -5,6 +5,7 @@ on: push
 jobs:
   Linux:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v6
 
@@ -19,7 +20,6 @@ jobs:
           haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
-          haxelib list
 
       - name: Set up HXCPP
         run: |
@@ -38,6 +38,7 @@ jobs:
 
   Windows:
     runs-on: windows-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v6
 
@@ -49,7 +50,6 @@ jobs:
         run: |
           haxelib setup C:/haxelib
           .\"setup/setup-windows.bat"
-          haxelib list
         shell: cmd
 
       - name: Set up HXCPP
@@ -69,7 +69,7 @@ jobs:
 
   macOS:
     runs-on: macos-latest
-
+    permissions: write-all
     steps:
       - uses: actions/checkout@v6
 
@@ -82,7 +82,6 @@ jobs:
           haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
-          haxelib list
 
       - name: Set up HXCPP
         run: |
