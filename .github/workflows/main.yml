@@ -19,7 +19,6 @@ jobs:
         run: |
           sudo apt-get install libvlc-dev
           sudo apt-get install libvlccore-dev
-          haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
 
@@ -46,7 +45,6 @@ jobs:
 
       - name: Install Libraries
         run: |
-          haxelib setup C:/haxelib
           .\"setup/setup-windows.bat"
         shell: cmd
 
@@ -73,7 +71,6 @@ jobs:
 
       - name: Install Libraries
         run: |
-          haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
 
