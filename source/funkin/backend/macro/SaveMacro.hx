@@ -1,6 +1,5 @@
 package funkin.backend.macro;
 
-#if macro
 // da ta 5 5 5 5 5 5 5
 // sorry if its a bit messy and incomplete macros are confusing !
 // #if macro
@@ -254,4 +253,3 @@ class SaveMacro
 		return fields;
 	}
 }
-#end

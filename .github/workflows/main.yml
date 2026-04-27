@@ -20,7 +20,6 @@ jobs:
           haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
-          hxpkg install
 
       - name: Set up HXCPP
         run: |
@@ -83,7 +82,6 @@ jobs:
           haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
-          hxpkg install
 
       - name: Set up HXCPP
         run: |
