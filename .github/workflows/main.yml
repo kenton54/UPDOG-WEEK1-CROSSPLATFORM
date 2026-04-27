@@ -17,8 +17,8 @@ jobs:
         run: |
           sudo apt-get install libvlc-dev
           sudo apt-get install libvlccore-dev
-          haxelib install hxpkg
-          haxelib run hxpkg setup
+          haxelib --global install hxpkg
+          haxelib --global run hxpkg setup
           hxpkg install
 
       - name: Set up HXCPP
@@ -48,8 +48,8 @@ jobs:
 
       - name: Install Libraries
         run: |
-          haxelib install hxpkg
-          haxelib run hxpkg setup
+          haxelib --global install hxpkg
+          haxelib --global run hxpkg setup
           hxpkg install
 
       - name: Set up HXCPP
@@ -79,8 +79,8 @@ jobs:
 
       - name: Install Libraries
         run: |
-          haxelib install hxpkg
-          haxelib run hxpkg setup
+          haxelib --global install hxpkg
+          haxelib --global run hxpkg setup
           hxpkg install
 
       - name: Set up HXCPP
