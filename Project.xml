@@ -5,7 +5,7 @@
 	<app title="Vs. Impostor" file="Vs. Impostor" packageName="com.updog.impostor" package="com.updog.impostor" main="Main" version="1.0.0" company="MotorFrog" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
-	<set name="APP_ID" value="0x0100f6c013bbc000" />
+	<!--set name="APP_ID" value="0x0100f6c013bbc000" /-->
 
 	<!-- NOTE TO SELF: DISABLE THIS IF ISSUES ARE FOUND -->
 	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB"/> <!-- stable luas PUT AFTER FIRST LINE WITH APP NAME AND ETC -->
@@ -65,10 +65,12 @@
 	<library name="songs"         preload="true" />
 
 	<!-- OpenAL config --> 	<!-- appreciate you cyn0x8 and smokey for finding this -->
+	<!-- this doesnt do anything if you dont force OpenAL to read it through code
 	<section if="desktop">
 		<assets path="projFiles/alsoft.ini" rename="alsoft.ini" type="text" if="windows"/>
 		<assets path="projFiles/alsoft.ini" rename="alsoft.conf" type="text" unless="windows"/>
 	</section>
+	-->
 
 	<!-- _______________________________ Libraries ______________________________ -->
 
