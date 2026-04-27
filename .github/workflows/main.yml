@@ -3,7 +3,7 @@ name: Build
 on: push
 
 jobs:
-  buildLinux:
+  Linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -22,7 +22,7 @@ jobs:
 
       - name: Set up HXCPP
         run: |
-          cd ./haxelib/hxcpp/git/tools/hxcpp/
+          cd ./.haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
           cd ../../../../../
 
@@ -35,7 +35,7 @@ jobs:
           name: VS IMPOSTOR (Linux)
           path: 'export/release/linux/bin'
 
-  buildWindows:
+  Windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
@@ -52,7 +52,7 @@ jobs:
 
       - name: Set up HXCPP
         run: |
-          cd ./haxelib/hxcpp/git/tools/hxcpp/
+          cd ./.haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
           cd ../../../../../
 
@@ -65,7 +65,7 @@ jobs:
           name: VS IMPOSTOR (Windows)
           path: export/release/windows/bin
 
-  buildMac:
+  macOS:
     runs-on: macos-latest
 
     steps:
@@ -83,7 +83,7 @@ jobs:
 
       - name: Set up HXCPP
         run: |
-          cd ./haxelib/hxcpp/git/tools/hxcpp/
+          cd ./.haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
           cd ../../../../../
 
