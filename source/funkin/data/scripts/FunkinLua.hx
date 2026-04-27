@@ -34,6 +34,9 @@ import funkin.objects.*;
 import funkin.states.substates.*;
 import funkin.objects.DialogueBoxPsych.DialogueFile;
 
+import funkin.modchart.ModchartSprite;
+import funkin.modchart.ModchartText;
+
 import llua.Lua;
 import llua.LuaL;
 import llua.State;
