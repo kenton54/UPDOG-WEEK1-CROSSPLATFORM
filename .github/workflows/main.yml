@@ -7,9 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - uses: actions/checkout@v6
+      - name: Pull Commit
+        uses: actions/checkout@v6
 
-      - uses: krdlab/setup-haxe@v2
+      - name: Install Haxe
+        uses: krdlab/setup-haxe@v2
         with:
           haxe-version: 4.3.7
 
@@ -20,12 +22,6 @@ jobs:
           haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
-
-      - name: Set up HXCPP
-        run: |
-          cd ~/haxelib/hxcpp/git/tools/hxcpp/
-          haxe compile.hxml
-          cd ~/
 
       - name: Compile
         run: haxelib run lime build linux
@@ -40,9 +36,11 @@ jobs:
     runs-on: windows-latest
     permissions: write-all
     steps:
-      - uses: actions/checkout@v6
+      - name: Pull Commit
+        uses: actions/checkout@v6
 
-      - uses: krdlab/setup-haxe@v2
+      - name: Install Haxe
+        uses: krdlab/setup-haxe@v2
         with:
           haxe-version: 4.3.7
 
@@ -51,12 +49,6 @@ jobs:
           haxelib setup C:/haxelib
           .\"setup/setup-windows.bat"
         shell: cmd
-
-      - name: Set up HXCPP
-        run: |
-          cd C:/haxelib/hxcpp/git/tools/hxcpp/
-          haxe compile.hxml
-          cd C:/
 
       - name: Compile
         run: haxelib run lime build windows
@@ -71,9 +63,11 @@ jobs:
     runs-on: macos-latest
     permissions: write-all
     steps:
-      - uses: actions/checkout@v6
+      - name: Pull Commit
+        uses: actions/checkout@v6
 
-      - uses: krdlab/setup-haxe@v2
+      - name: Install Haxe
+        uses: krdlab/setup-haxe@v2
         with:
           haxe-version: 4.3.7
 
@@ -82,12 +76,6 @@ jobs:
           haxelib setup ~/haxelib
           chmod +x ./setup/setup.sh
           sh ./setup/setup.sh
-
-      - name: Set up HXCPP
-        run: |
-          cd ~/haxelib/hxcpp/git/tools/hxcpp/
-          haxe compile.hxml
-          cd ~/
 
       - name: Compile
         run: arch -x86_64 haxelib run lime build mac
