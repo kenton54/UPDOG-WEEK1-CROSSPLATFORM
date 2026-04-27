@@ -82,7 +82,6 @@
 	
 	<haxelib name="hscript"/>
 	<haxelib name="hscript-iris"/>
-	<define name="hscriptPos"/>
 
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
@@ -101,6 +100,7 @@
 	<!-- ______________________________ Haxedefines _____________________________ -->
 
 	<haxedef name="CRASH_HANDLER" if="desktop release"/>
+	<haxedef name="hscriptPos" />
 
 	<haxedef name="HXCPP_CHECK_POINTER" if="CRASH_HANDLER" />
 	<haxedef name="HXCPP_STACK_LINE" if="CRASH_HANDLER" />

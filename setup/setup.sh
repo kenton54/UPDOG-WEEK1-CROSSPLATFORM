@@ -7,7 +7,7 @@ haxelib install flixel
 haxelib install flixel-addons
 haxelib install flixel-tools
 haxelib install flixel-ui
-haxelib install flxanimate
+haxelib git flxanimate https://github.com/FixedData/flxanimate
 haxelib install tjson
 haxelib install hscript
 haxelib install hscript-iris
