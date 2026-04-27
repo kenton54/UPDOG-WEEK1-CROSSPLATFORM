@@ -240,7 +240,7 @@ class TitleState extends MusicBeatState
 		lt.scrollFactor.set();
 		add(lt);
 
-		insert(members.indexOf(bb), snowEmitter);
+		insert(members.indexOf(bg) + 1, snowEmitter);
 
 		zared = new FlxSprite().loadGraphic(Paths.image('menu/secret/zared'));
 		zared.antialiasing = ClientPrefs.globalAntialiasing;
