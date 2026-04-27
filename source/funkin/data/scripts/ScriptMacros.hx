@@ -8,7 +8,6 @@ import haxe.macro.Type.ClassField;
 
 using haxe.macro.Tools;
 using Lambda;
-#end
 
 class ScriptMacros
 {
@@ -210,3 +209,4 @@ class ScriptMacros
 		return fields;
 	}
 }
+#end

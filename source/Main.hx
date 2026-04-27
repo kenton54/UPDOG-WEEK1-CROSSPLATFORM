@@ -28,11 +28,6 @@ class Main extends Sprite
 	// You can pretty much ignore everything from here on - your code should go in your states.
 	public static var fpsVar:DebugDisplay;
 
-	static function __init__()
-	{
-		funkin.utils.MacroUtil.haxeVersionEnforcement();
-	}
-
 	public static function main()
 	{
 		#if linux

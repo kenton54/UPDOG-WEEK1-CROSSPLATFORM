@@ -17,15 +17,16 @@ jobs:
         run: |
           sudo apt-get install libvlc-dev
           sudo apt-get install libvlccore-dev
-          haxelib --global install hxpkg
-          haxelib --global run hxpkg setup
+          haxelib setup ~/haxelib
+          chmod +x ./setup/setup.sh
+          sh ./setup/setup.sh
           hxpkg install
 
       - name: Set up HXCPP
         run: |
-          cd ./.haxelib/hxcpp/git/tools/hxcpp/
+          cd ~/haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
-          cd ../../../../../
+          cd ~/
 
       - name: Compile
         run: haxelib run lime build linux
@@ -48,15 +49,15 @@ jobs:
 
       - name: Install Libraries
         run: |
-          haxelib --global install hxpkg
-          haxelib --global run hxpkg setup
-          hxpkg install
+          haxelib setup C:/haxelib
+          .\"setup/setup-windows.bat"
+        shell: cmd
 
       - name: Set up HXCPP
         run: |
-          cd ./.haxelib/hxcpp/git/tools/hxcpp/
+          cd C:/haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
-          cd ../../../../../
+          cd C:/
 
       - name: Compile
         run: haxelib run lime build windows
@@ -79,15 +80,16 @@ jobs:
 
       - name: Install Libraries
         run: |
-          haxelib --global install hxpkg
-          haxelib --global run hxpkg setup
+          haxelib setup ~/haxelib
+          chmod +x ./setup/setup.sh
+          sh ./setup/setup.sh
           hxpkg install
 
       - name: Set up HXCPP
         run: |
-          cd ./.haxelib/hxcpp/git/tools/hxcpp/
+          cd ~/haxelib/hxcpp/git/tools/hxcpp/
           haxe compile.hxml
-          cd ../../../../../
+          cd ~/
 
       - name: Compile
         run: arch -x86_64 haxelib run lime build mac

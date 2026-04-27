@@ -6,7 +6,6 @@ import haxe.macro.Context;
 
 using haxe.macro.Tools;
 using Lambda;
-#end
 
 class MacroUtil
 {
@@ -244,3 +243,4 @@ class MacroUtil
 		return fields;
 	}
 }
+#end
